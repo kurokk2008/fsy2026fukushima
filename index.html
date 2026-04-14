@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#2f80ed">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="FSY Checkin">
-
     <title>fsy2026福島 事前合宿チェックイン</title>
-
-    <!--
-      将来、外部ホスティングに移してPWA化する際に有効になります。
-      Apps Script配信のままでは manifest / service worker は本格運用しにくいですが、
-      先に入れておいても問題ない構成にしています。
-    -->
-    <link rel="manifest" href="./manifest.html">
+    <link rel="manifest" href="./manifest.json">
 
     <style>
       :root {
@@ -251,7 +243,7 @@
     <div class="card">
       <img
         class="logo"
-        src="https://lh3.googleusercontent.com/d/1iT3KoD1c3hi1c5BnLy6DIZ5nHgtYDU68"
+        src="./icons/icon-512.png"
         alt="fsy2026福島 ロゴ"
       >
 
@@ -283,6 +275,8 @@
     </div>
 
     <script>
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbx9AU4s8VvNyN2F-EY_S_8K3biYlRujHXw3ERBqbTK6aMUsVXuHs_o3kUVFSsh_GqiCpA/exec";
+
       let isSubmitting = false;
       let deferredInstallPrompt = null;
 
@@ -304,15 +298,14 @@
       }
 
       function updateOnlineState() {
-        const isOnline = navigator.onLine;
-        offlineBadge.style.display = isOnline ? "none" : "block";
+        offlineBadge.style.display = navigator.onLine ? "none" : "block";
       }
 
       window.addEventListener("online", updateOnlineState);
       window.addEventListener("offline", updateOnlineState);
       updateOnlineState();
 
-      function submitCheckIn() {
+      async function submitCheckIn() {
         if (isSubmitting) return;
 
         const name = document.getElementById("name").value.trim();
@@ -333,21 +326,25 @@
         button.textContent = "確認中...";
         result.innerHTML = '<div class="loading-text">照合しています…</div>';
 
-        google.script.run
-          .withSuccessHandler(function(res) {
-            showResult(res);
-            isSubmitting = false;
-            button.disabled = false;
-            button.textContent = "チェックイン";
-          })
-          .withFailureHandler(function(error) {
-            console.error(error);
-            result.innerHTML = '<div class="panel error-box">エラーが発生しました。通信状況を確認して、もう一度お試しください。</div>';
-            isSubmitting = false;
-            button.disabled = false;
-            button.textContent = "チェックイン";
-          })
-          .checkIn(name, birth);
+        try {
+          const response = await fetch(GAS_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({ name, birth })
+          });
+
+          const res = await response.json();
+          showResult(res);
+        } catch (error) {
+          console.error(error);
+          result.innerHTML = '<div class="panel error-box">通信エラーが発生しました。もう一度お試しください。</div>';
+        } finally {
+          isSubmitting = false;
+          button.disabled = false;
+          button.textContent = "チェックイン";
+        }
       }
 
       function buildNoticeHtml(note) {
@@ -455,10 +452,6 @@
         `;
       }
 
-      /*
-        PWA: インストール案内
-        beforeinstallprompt は対応ブラウザのみ動作します。
-      */
       window.addEventListener("beforeinstallprompt", function(event) {
         event.preventDefault();
         deferredInstallPrompt = event;
@@ -484,21 +477,19 @@
         installBox.style.display = "none";
       });
 
-      /*
-        PWA: Service Worker 登録
-        Apps Script上では期待通りに動かない場合がありますが、
-        外部ホスティングへ移した際はこのまま使える形です。
-      */
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async function() {
           try {
-            const registration = await navigator.serviceWorker.register("./service-worker.html");
+            const registration = await navigator.serviceWorker.register("./service-worker.js");
             console.log("Service Worker registered:", registration.scope);
           } catch (error) {
             console.warn("Service Worker registration failed:", error);
           }
         });
       }
+    </script>
+  </body>
+</html>
     </script>
   </body>
 </html>
