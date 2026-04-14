@@ -326,26 +326,50 @@
         button.textContent = "確認中...";
         result.innerHTML = '<div class="loading-text">照合しています…</div>';
 
-        try {
-          const response = await fetch(GAS_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({ name, birth })
-          });
+        const callbackName = "jsonpCheckInCallback_" + Date.now();
 
-          const res = await response.json();
-          showResult(res);
-        } catch (error) {
-          console.error(error);
-          result.innerHTML = '<div class="panel error-box">通信エラーが発生しました。もう一度お試しください。</div>';
-        } finally {
-          isSubmitting = false;
-          button.disabled = false;
-          button.textContent = "チェックイン";
-        }
-      }
+        window[callbackName] = function(res) {
+          try {
+            showResult(res);
+          } finally {
+            cleanup();
+          }
+       };
+
+  function cleanup() {
+    isSubmitting = false;
+    button.disabled = false;
+    button.textContent = "チェックイン";
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
+    delete window[callbackName];
+    clearTimeout(timeoutId);
+  }
+
+  const params = new URLSearchParams({
+    api: "checkIn",
+    name: name,
+    birth: birth,
+    callback: callbackName
+  });
+
+  const script = document.createElement("script");
+  script.src = `${GAS_URL}?${params.toString()}`;
+
+  script.onerror = function() {
+    result.innerHTML = '<div class="panel error-box">通信エラーが発生しました。Apps Scriptの公開設定をご確認ください。</div>';
+    cleanup();
+  };
+
+  const timeoutId = setTimeout(function() {
+    result.innerHTML = '<div class="panel error-box">応答がタイムアウトしました。Apps Scriptの再デプロイと公開設定をご確認ください。</div>';
+    cleanup();
+  }, 15000);
+
+  document.body.appendChild(script);
+}
 
       function buildNoticeHtml(note) {
         const safeNote = String(note || "").trim();
@@ -487,9 +511,6 @@
           }
         });
       }
-    </script>
-  </body>
-</html>
     </script>
   </body>
 </html>
