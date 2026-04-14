@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#2f80ed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FSY Checkin">
+
+    <title>fsy2026福島 事前合宿チェックイン</title>
+
+    <!--
+      将来、外部ホスティングに移してPWA化する際に有効になります。
+      Apps Script配信のままでは manifest / service worker は本格運用しにくいですが、
+      先に入れておいても問題ない構成にしています。
+    -->
+    <link rel="manifest" href="./manifest.html">
+
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --sub: #6b7280;
+        --primary: #2f80ed;
+        --primary-hover: #1c6fe0;
+        --primary-disabled: #b7c7e6;
+        --success-bg: #e8f5e9;
+        --success-text: #1b5e20;
+        --warn-bg: #fff8e1;
+        --warn-text: #8d6e00;
+        --error-bg: #fdecea;
+        --error-text: #b71c1c;
+        --notice-bg: #f8f9fa;
+        --border: #d7dee8;
+        --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: sans-serif;
+      }
+
+      body {
+        padding: 20px;
+      }
+
+      .card {
+        max-width: 460px;
+        margin: 24px auto;
+        background: var(--card);
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .logo {
+        display: block;
+        margin: 0 auto 20px;
+        max-width: 220px;
+        width: 100%;
+        height: auto;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        text-align: center;
+        font-size: 24px;
+        line-height: 1.4;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-top: 14px;
+        margin-bottom: 6px;
+      }
+
+      .help-text {
+        font-size: 12px;
+        color: var(--sub);
+        margin-top: -2px;
+        margin-bottom: 6px;
+      }
+
+      input {
+        width: 100%;
+        font-size: 16px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.15);
+      }
+
+      button {
+        width: 100%;
+        margin-top: 24px;
+        padding: 15px;
+        font-size: 17px;
+        font-weight: bold;
+        color: white;
+        background: var(--primary);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      button:hover {
+        background: var(--primary-hover);
+      }
+
+      button:active {
+        transform: scale(0.99);
+      }
+
+      button:disabled {
+        background: var(--primary-disabled);
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      #result {
+        margin-top: 24px;
+      }
+
+      .panel {
+        padding: 14px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+      }
+
+      .success-box {
+        background: var(--success-bg);
+        color: var(--success-text);
+      }
+
+      .duplicate-box {
+        background: var(--warn-bg);
+        color: var(--warn-text);
+      }
+
+      .error-box {
+        background: var(--error-bg);
+        color: var(--error-text);
+      }
+
+      .notice-box {
+        background: var(--notice-bg);
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 12px;
+      }
+
+      .notice-box p {
+        margin: 0 0 8px;
+      }
+
+      .notice-box ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .info-row {
+        margin: 10px 0;
+        line-height: 1.7;
+        word-break: break-word;
+      }
+
+      .result-link {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      .result-link:hover {
+        text-decoration: underline;
+      }
+
+      .loading-text {
+        text-align: center;
+        color: var(--sub);
+        padding: 10px 0;
+      }
+
+      .install-box {
+        display: none;
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #eef5ff;
+        color: #184b91;
+      }
+
+      .install-box button {
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+
+      .offline-badge {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        background: #fff4e5;
+        color: #8a5200;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+
+        .card {
+          margin: 12px auto;
+          padding: 20px 16px;
+          border-radius: 14px;
+        }
+
+        h1 {
+          font-size: 21px;
+        }
+
+        button {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <img
+        class="logo"
+        src="https://lh3.googleusercontent.com/d/1iT3KoD1c3hi1c5BnLy6DIZ5nHgtYDU68"
+        alt="fsy2026福島 ロゴ"
+      >
+
+      <h1>fsy2026福島　事前合宿チェックイン</h1>
+
+      <div id="offlineBadge" class="offline-badge">
+        現在オフラインです。通信が回復すると最新情報を取得できます。
+      </div>
+
+      <label for="name">名前</label>
+      <input
+        id="name"
+        placeholder="例（日本人）：福島たろう　（英名）：MichaelSmith"
+        autocomplete="name"
+      >
+
+      <label for="birth">生年月日</label>
+      <div class="help-text">※本人確認のため入力してください</div>
+      <input id="birth" type="date">
+
+      <button id="checkinButton" type="button">チェックイン</button>
+
+      <div id="installBox" class="install-box">
+        <div>この画面をホーム画面に追加すると、受付端末で開きやすくなります。</div>
+        <button id="installButton" type="button">ホーム画面に追加</button>
+      </div>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+      let isSubmitting = false;
+      let deferredInstallPrompt = null;
+
+      const button = document.getElementById("checkinButton");
+      const result = document.getElementById("result");
+      const offlineBadge = document.getElementById("offlineBadge");
+      const installBox = document.getElementById("installBox");
+      const installButton = document.getElementById("installButton");
+
+      button.addEventListener("click", submitCheckIn);
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function updateOnlineState() {
+        const isOnline = navigator.onLine;
+        offlineBadge.style.display = isOnline ? "none" : "block";
+      }
+
+      window.addEventListener("online", updateOnlineState);
+      window.addEventListener("offline", updateOnlineState);
+      updateOnlineState();
+
+      function submitCheckIn() {
+        if (isSubmitting) return;
+
+        const name = document.getElementById("name").value.trim();
+        const birth = document.getElementById("birth").value;
+
+        if (!name || !birth) {
+          result.innerHTML = '<div class="panel error-box">名前と生年月日を入力してください。</div>';
+          return;
+        }
+
+        if (!navigator.onLine) {
+          result.innerHTML = '<div class="panel error-box">現在オフラインのため、チェックイン照合を実行できません。通信接続をご確認ください。</div>';
+          return;
+        }
+
+        isSubmitting = true;
+        button.disabled = true;
+        button.textContent = "確認中...";
+        result.innerHTML = '<div class="loading-text">照合しています…</div>';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            showResult(res);
+            isSubmitting = false;
+            button.disabled = false;
+            button.textContent = "チェックイン";
+          })
+          .withFailureHandler(function(error) {
+            console.error(error);
+            result.innerHTML = '<div class="panel error-box">エラーが発生しました。通信状況を確認して、もう一度お試しください。</div>';
+            isSubmitting = false;
+            button.disabled = false;
+            button.textContent = "チェックイン";
+          })
+          .checkIn(name, birth);
+      }
+
+      function buildNoticeHtml(note) {
+        const safeNote = String(note || "").trim();
+
+        if (!safeNote) {
+          return `
+            <div class="notice-box">
+              <p><strong>ご案内</strong></p>
+              <p>現在ご案内はありません。</p>
+            </div>
+          `;
+        }
+
+        const items = safeNote
+          .split(/\r?\n/)
+          .map(item => item.trim())
+          .filter(Boolean);
+
+        if (items.length === 0) {
+          return `
+            <div class="notice-box">
+              <p><strong>ご案内</strong></p>
+              <p>現在ご案内はありません。</p>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="notice-box">
+            <p><strong>ご案内</strong></p>
+            <ul>
+              ${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+      }
+
+      function buildRoomHtml(res) {
+        const room = escapeHtml(res.room || "未設定");
+        const link = res.roomMapUrl
+          ? `<a class="result-link" href="${escapeHtml(res.roomMapUrl)}" target="_blank" rel="noopener noreferrer">地図を見る</a>`
+          : "";
+
+        return `
+          <div class="info-row">
+            宿泊部屋：${room}
+            ${link}
+          </div>
+        `;
+      }
+
+      function buildBaggageHtml(res) {
+        const baggage = escapeHtml(res.baggage || "未設定");
+        const link = res.baggageMapUrl
+          ? `<a class="result-link" href="${escapeHtml(res.baggageMapUrl)}" target="_blank" rel="noopener noreferrer">配置図を見る</a>`
+          : "";
+
+        return `
+          <div class="info-row">
+            荷物置き場：${baggage}
+            ${link}
+          </div>
+        `;
+      }
+
+      function showResult(res) {
+        if (!res || !res.status) {
+          result.innerHTML = '<div class="panel error-box">応答の形式が正しくありません。</div>';
+          return;
+        }
+
+        const noteHtml = buildNoticeHtml(res.note);
+        const roomHtml = buildRoomHtml(res);
+        const baggageHtml = buildBaggageHtml(res);
+
+        if (res.status === "ok") {
+          result.innerHTML = `
+            <div class="panel success-box"><strong>${escapeHtml(res.message || "チェックイン完了しました。")}</strong></div>
+            <div class="info-row">名前：${escapeHtml(res.name || "")}</div>
+            <div class="info-row">グループ：${escapeHtml(res.group || "未設定")}</div>
+            ${roomHtml}
+            ${baggageHtml}
+            <div class="info-row">受付時刻：${escapeHtml(res.checkedInAt || "")}</div>
+            ${noteHtml}
+          `;
+          return;
+        }
+
+        if (res.status === "duplicate") {
+          result.innerHTML = `
+            <div class="panel duplicate-box"><strong>${escapeHtml(res.message || "すでにチェックイン済みです。")}</strong></div>
+            <div class="info-row">名前：${escapeHtml(res.name || "")}</div>
+            <div class="info-row">グループ：${escapeHtml(res.group || "未設定")}</div>
+            ${roomHtml}
+            ${baggageHtml}
+            <div class="info-row">初回受付時刻：${escapeHtml(res.checkedInAt || "記録なし")}</div>
+            ${noteHtml}
+          `;
+          return;
+        }
+
+        result.innerHTML = `
+          <div class="panel error-box">${escapeHtml(res.message || "該当する参加者が見つかりませんでした。")}</div>
+        `;
+      }
+
+      /*
+        PWA: インストール案内
+        beforeinstallprompt は対応ブラウザのみ動作します。
+      */
+      window.addEventListener("beforeinstallprompt", function(event) {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        installBox.style.display = "block";
+      });
+
+      installButton.addEventListener("click", async function() {
+        if (!deferredInstallPrompt) return;
+
+        deferredInstallPrompt.prompt();
+        try {
+          await deferredInstallPrompt.userChoice;
+        } catch (e) {
+          console.error(e);
+        }
+
+        deferredInstallPrompt = null;
+        installBox.style.display = "none";
+      });
+
+      window.addEventListener("appinstalled", function() {
+        deferredInstallPrompt = null;
+        installBox.style.display = "none";
+      });
+
+      /*
+        PWA: Service Worker 登録
+        Apps Script上では期待通りに動かない場合がありますが、
+        外部ホスティングへ移した際はこのまま使える形です。
+      */
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async function() {
+          try {
+            const registration = await navigator.serviceWorker.register("./service-worker.html");
+            console.log("Service Worker registered:", registration.scope);
+          } catch (error) {
+            console.warn("Service Worker registration failed:", error);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
