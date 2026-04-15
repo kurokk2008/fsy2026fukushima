@@ -44,6 +44,27 @@
         font-weight: bold;
         text-decoration: none;
       }
+
+      /* 戻るボタン */
+      .menu-link {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: bold;
+        text-decoration: none;
+        color: #fff;
+        background: #2f80ed;
+      }
+
+      .menu-link.back {
+        background: #6b7280;
+      }
+
+      .menu-link.back:hover {
+        background: #4b5563;
+      }
+      
     </style>
   </head>
 
@@ -61,7 +82,9 @@
     </div>
 
     <div class="card">
-      <a class="back" href="./participant-home.html">参加者ホームへ戻る</a>
+      <a class="menu-link back" href="./participant-home.html">
+        ← 参加者ホームへ戻る
+      </a>
     </div>
   </body>
 </html>
