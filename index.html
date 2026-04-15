@@ -475,6 +475,11 @@
         }
 
         if (res.status === "duplicate") {
+          localStorage.setItem("participant_name", res.name || "");
+          localStorage.setItem("participant_group", res.group || "");
+          localStorage.setItem("participant_room", res.room || "");
+          localStorage.setItem("participant_baggage", res.baggage || "");
+
           result.innerHTML = `
             <div class="panel duplicate-box"><strong>${escapeHtml(res.message || "すでにチェックイン済みです。")}</strong></div>
             <div class="info-row">名前：${escapeHtml(res.name || "")}</div>
@@ -483,6 +488,9 @@
             ${baggageHtml}
             <div class="info-row">初回受付時刻：${escapeHtml(res.checkedInAt || "記録なし")}</div>
             ${noteHtml}
+            <div class="info-row" style="margin-top:16px;">
+              <a class="home-button" href="${PARTICIPANT_HOME_URL}">参加者ホームへ進む</a>
+            </div>
           `;
           return;
         }
