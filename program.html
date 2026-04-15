@@ -54,17 +54,24 @@
 
       .program-item {
         display: grid;
-        grid-template-columns: 90px 1fr;
+        grid-template-columns: 120px 1fr 160px;
         gap: 12px;
         padding: 12px;
         border: 1px solid var(--border);
         border-radius: 12px;
         background: #f8fafc;
+        align-items: center;
       }
 
       .time {
         font-weight: bold;
         color: var(--primary);
+      }
+
+      .place {
+        color: var(--sub);
+        font-size: 14px;
+        text-align: right;
       }
 
       .menu {
@@ -88,9 +95,14 @@
       }
 
       @media (max-width: 480px) {
+
         .program-item {
           grid-template-columns: 1fr;
           gap: 6px;
+        }
+
+        .place {
+          text-align: left;
         }
       }
     </style>
@@ -141,6 +153,7 @@
           <div class="program-item">
             <div class="time">${item.time}</div>
             <div>${item.title}</div>
+            <div class="place">${item.place || ""}</div>
           </div>
         `).join("");
       }
