@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>宿泊部屋案内</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --sub: #6b7280;
+        --primary: #2f80ed;
+        --border: #d7dee8;
+        --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 16px;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 24px;
+      }
+
+      p {
+        margin: 0 0 10px;
+        line-height: 1.7;
+      }
+
+      .sub {
+        color: var(--sub);
+        font-size: 14px;
+      }
+
+      .map-wrap {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .map-image {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .note {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 8px;
+        color: var(--primary);
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 21px;
+        }
+
+        body {
+          padding: 12px;
+        }
+
+        .card {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>宿泊部屋案内</h1>
+        <p>自分の宿泊部屋を確認して、建物・部屋番号に沿って移動してください。</p>
+        <p class="sub">スマホでは画像をピンチ操作で拡大してご確認ください。</p>
+      </div>
+
+      <div class="card">
+        <div class="map-wrap">
+          <img
+            class="map-image"
+            src="https://drive.google.com/uc?id=1-CpDIw0SFeeT-a65fufI4JpZd4lxVVko"
+            alt="宿泊部屋案内図"
+          >
+        </div>
+      </div>
+
+      <div class="card note">
+        <p><strong>見方のポイント</strong></p>
+        <p>・受付で案内された部屋番号を確認してください。</p>
+        <p>・建物名や棟番号を先に確認すると見つけやすくなります。</p>
+        <p>・荷物置き場は別ページで確認できます。</p>
+        <a class="back-link" href="./index.html">チェックイン画面へ戻る</a>
+      </div>
+    </div>
+  </body>
+</html>
