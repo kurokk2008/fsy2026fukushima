@@ -233,8 +233,8 @@
           <thead>
             <tr>
               <th>名前</th>
-              <th>生年月日</th>
               <th>所属ステーク・地方部</th>
+              <th>役割</th>
               <th>グループ</th>
               <th>宿泊部屋</th>
               <th>荷物置き場</th>
@@ -261,8 +261,8 @@
           <thead>
             <tr>
               <th>名前</th>
-              <th>生年月日</th>
               <th>所属ステーク・地方部</th>
+              <th>役割</th>
               <th>グループ</th>
               <th>宿泊部屋</th>
               <th>荷物置き場</th>
@@ -275,7 +275,7 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbwqnFXxVexrsJqaOukpEMv7ndcu28OFh6vB_9wRw1ETgMM1RUrvTutZMZBf1SokI8OlAA/exec";                // fsy2026福島 PWA Ver15
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbz6aGlbDY5IHWcWUoFk-idTpctbJHo1VvaOLp4FD_DbdDCZnS3mmWmkCldX6A37giuXyg/exec";                // fsy2026福島 PWA Ver16
 
       const loadButton = document.getElementById("loadButton");
       const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
@@ -455,8 +455,8 @@
         tbody.innerHTML = items.map(item => `
           <tr>
             <td>${escapeHtml(item.name || "")}</td>
-            <td>${escapeHtml(item.birth || "")}</td>
             <td>${escapeHtml(item.stake || "")}</td>
+            <td>${escapeHtml(item.role)}</td>
             <td>${escapeHtml(item.group || "")}</td>
             <td>${escapeHtml(item.room || "")}</td>
             <td>${escapeHtml(item.baggage || "")}</td>
@@ -481,8 +481,8 @@
         tbody.innerHTML = items.map(item => `
           <tr>
             <td>${escapeHtml(item.name || "")}</td>
-            <td>${escapeHtml(item.birth || "")}</td>
             <td>${escapeHtml(item.stake || "")}</td>
+            <td>${escapeHtml(item.role)}</td>
             <td>${escapeHtml(item.group || "")}</td>
             <td>${escapeHtml(item.room || "")}</td>
             <td>${escapeHtml(item.baggage || "")}</td>
