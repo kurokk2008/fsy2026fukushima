@@ -419,6 +419,15 @@
           showMessage(error.message, "error");
         }
       }
+
+      // 30秒毎にstaff画面の一覧を更新するインターバルの設定
+      
+      setInterval(() => {
+        if (getStaffKey()) {
+          loadSummary();
+          loadUncheckedList();
+        }
+      }, 30000);
     </script>
   </body>
 </html>
