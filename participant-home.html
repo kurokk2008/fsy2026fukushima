@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>fsy2026福島 参加者ホーム</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --sub: #6b7280;
+        --primary: #2f80ed;
+        --primary-hover: #1c6fe0;
+        --border: #d7dee8;
+        --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 16px;
+      }
+
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+
+      .logo {
+        display: block;
+        margin: 0 auto 16px;
+        max-width: 180px;
+        width: 100%;
+        height: auto;
+      }
+
+      h1, h2 {
+        margin-top: 0;
+      }
+
+      p {
+        line-height: 1.7;
+      }
+
+      .sub {
+        color: var(--sub);
+        font-size: 14px;
+      }
+
+      .menu {
+        display: grid;
+        gap: 12px;
+      }
+
+      .menu-link {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .menu-link:hover {
+        background: var(--primary-hover);
+      }
+
+      .info-box {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .info-row {
+        margin: 8px 0;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+
+        .card {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <img
+          class="logo"
+          src="./icons/icon-512.png?v=4"
+          alt="fsy2026福島 ロゴ"
+        >
+        <h1>fsy2026福島 参加者ホーム</h1>
+        <p>チェックイン後に必要な情報を、ここから確認できます。</p>
+        <p class="sub">このページをブックマークしておくと便利です。</p>
+      </div>
+
+      <div class="card">
+        <h2>あなたの案内</h2>
+        <div class="info-box">
+          <div class="info-row"><strong>名前：</strong><span id="userName">未設定</span></div>
+          <div class="info-row"><strong>グループ：</strong><span id="userGroup">未設定</span></div>
+          <div class="info-row"><strong>宿泊部屋：</strong><span id="userRoom">未設定</span></div>
+          <div class="info-row"><strong>荷物置き場：</strong><span id="userBaggage">未設定</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>メニュー</h2>
+        <div class="menu">
+          <a class="menu-link" href="./room-map.html">宿泊部屋の地図を見る</a>
+          <a class="menu-link" href="./baggage-map.html">荷物置き場の地図を見る</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>プログラム</h2>
+        <div class="info-box">
+          <p>ここに当日のプログラムを掲載します。</p>
+          <ul>
+            <li>12:00〜 昼食</li>
+            <li>13:15〜 集合・開始</li>
+            <li>以降の予定はスタッフの案内に従ってください</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>ご案内</h2>
+        <div class="info-box">
+          <ul>
+            <li>受付で案内された内容を優先してください。</li>
+            <li>集合時間には余裕をもって移動してください。</li>
+            <li>困ったことがあればスタッフへお声がけください。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function safeGet(key) {
+        return localStorage.getItem(key) || "未設定";
+      }
+
+      document.getElementById("userName").textContent = safeGet("participant_name");
+      document.getElementById("userGroup").textContent = safeGet("participant_group");
+      document.getElementById("userRoom").textContent = safeGet("participant_room");
+      document.getElementById("userBaggage").textContent = safeGet("participant_baggage");
+    </script>
+  </body>
+</html>
