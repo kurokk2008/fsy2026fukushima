@@ -109,14 +109,29 @@
         }
       }
 
-        .menu-link.danger {
-          background: #e53935;
-          font-size: 16px;
-        }
+      .menu-link.danger {
+        background: #e53935;
+        font-size: 16px;
+      }
+      .menu-link.danger:hover {
+        background: #c62828;
+      }
 
-        .menu-link.danger:hover {
-          background: #c62828;
-        }
+      /* プログラム（青） */
+      .menu-link.program {
+        background: #2f80ed;
+      }
+      .menu-link.program:hover {
+        background: #1c6fe0;
+      }
+
+      /* 地図（緑） */
+      .menu-link.map {
+        background: #27ae60;
+      }
+      .menu-link.map:hover {
+        background: #1e8e4d;
+      }
     </style>
   </head>
   <body>
@@ -142,13 +157,22 @@
         </div>
       </div>
 
+      <!-- 👇ここに追加（ベスト） -->
+      <div class="card">
+        <h2>まずはこちら</h2>
+        <div class="menu">
+          <a class="menu-link program" href="#">📅 今日のプログラムを見る</a>
+          <a class="menu-link map" href="./site-map.html">🗺️ 施設全体マップ</a>
+        </div>
+      </div>
+      
       <div class="menu">
-        <a class="menu-link" href="./site-map.html">施設全体マップを見る</a>
-        <a class="menu-link" href="./room-map.html">宿泊部屋の地図を見る</a>
-        <a class="menu-link" href="./baggage-map.html">荷物置き場の地図を見る</a>
+        <a class="menu-link map" href="./site-map.html">🗺️ 施設全体マップを見る</a>
+        <a class="menu-link map" href="./room-map.html">🏠 宿泊部屋の地図を見る</a>
+        <a class="menu-link map" href="./baggage-map.html">🎒 荷物置き場の地図を見る</a>
 
         <a class="menu-link danger" href="https://forms.gle/QXcsjUV5mvp694xv6" target="_blank">
-          インシデントを報告する
+          ⚠️ インシデントを報告する
         </a>
       </div>
 
@@ -163,9 +187,9 @@
       <div class="card">
         <h2>各日のプログラム</h2>
         <div class="menu">
-          <a class="menu-link" href="./program.html?day=day1">1日目の全プログラムを見る</a>
-          <a class="menu-link" href="./program.html?day=day2">2日目の全プログラムを見る</a>
-          <a class="menu-link" href="./program.html?day=day3">3日目の全プログラムを見る</a>
+          <a class="menu-link program" href="./program.html?day=day1">📅 1日目の全プログラム</a>
+          <a class="menu-link program" href="./program.html?day=day2">📅 2日目の全プログラム</a>
+          <a class="menu-link program" href="./program.html?day=day3">📅 3日目の全プログラム</a>
         </div>
       </div>
 
