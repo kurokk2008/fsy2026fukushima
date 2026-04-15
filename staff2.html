@@ -275,7 +275,7 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbwWn3gH9Psj-7oDObQkNQNq0EQEEI1CB5NmcFo0JFRvmeC-shqoL3st4kriD0r_BubVXw/exec";                // fsy2026福島 PWA Ver18
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbwbS83DW3v58evOq-EpOy7S4kUUoITOhwbvcVTT8J16MvREIe6cAVgpb8TghbYNGyGHcA/exec";                // fsy2026福島 PWA Ver19
 
       const loadButton = document.getElementById("loadButton");
       const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
@@ -523,6 +523,15 @@
           showMessage(error.message, "error");
         }
       }
+    
+    setInterval(() => {
+        if (getStaffKey()) {
+          loadSummary();
+          loadUncheckedList();
+          loadCheckedInList();
+        }
+    }, 30000);
+      
     </script>
   </body>
 </html>
