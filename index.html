@@ -224,6 +224,23 @@
           font-size: 16px;
         }
       }
+
+      .home-button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 16px;
+        padding: 14px;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: bold;
+      }
+
+      .home-button:hover {
+        background: var(--primary-hover);
+      }
     </style>
   </head>
 
@@ -259,6 +276,7 @@
 
     <script>
       const GAS_URL = "https://script.google.com/macros/s/AKfycbyBR62fVfWUjmkWO31g8ditPVmb6J9Q-fzZe4ohFPKqj-6KF3jZbn1KZ0-zOkGFboe4DA/exec";              // fsy2026福島 PWA Ver22
+      const PARTICIPANT_HOME_URL = "./participant-home.html";                                                                                            // 登録後の参加者メニュー
 
       // 安定運用のため、既存の Service Worker を解除
       if ("serviceWorker" in navigator) {
@@ -436,6 +454,11 @@
         const baggageHtml = buildBaggageHtml(res);
 
         if (res.status === "ok") {
+          localStorage.setItem("participant_name", res.name || "");
+          localStorage.setItem("participant_group", res.group || "");
+          localStorage.setItem("participant_room", res.room || "");
+          localStorage.setItem("participant_baggage", res.baggage || "");
+
           result.innerHTML = `
             <div class="panel success-box"><strong>${escapeHtml(res.message || "チェックイン完了しました。")}</strong></div>
             <div class="info-row">名前：${escapeHtml(res.name || "")}</div>
@@ -444,6 +467,9 @@
             ${baggageHtml}
             <div class="info-row">受付時刻：${escapeHtml(res.checkedInAt || "")}</div>
             ${noteHtml}
+            <div class="info-row" style="margin-top:16px;">
+              <a class="home-button" href="${PARTICIPANT_HOME_URL}">参加者ホームへ進む</a>
+            </div>
           `;
           return;
         }
