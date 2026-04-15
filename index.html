@@ -7,8 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="FSY Checkin">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>fsy2026福島 事前合宿チェックイン</title>
-    <link rel="manifest" href="./manifest.json">
 
     <style>
       :root {
@@ -193,20 +195,6 @@
         padding: 10px 0;
       }
 
-      .install-box {
-        display: none;
-        margin-top: 16px;
-        padding: 12px;
-        border-radius: 10px;
-        background: #eef5ff;
-        color: #184b91;
-      }
-
-      .install-box button {
-        margin-top: 10px;
-        margin-bottom: 0;
-      }
-
       .offline-badge {
         display: none;
         margin-top: 12px;
@@ -243,7 +231,7 @@
     <div class="card">
       <img
         class="logo"
-        src="./icons/icon-512.png?v=2"
+        src="./icons/icon-512.png?v=4"
         alt="fsy2026福島 ロゴ"
       >
 
@@ -266,25 +254,26 @@
 
       <button id="checkinButton" type="button">チェックイン</button>
 
-      <div id="installBox" class="install-box">
-        <div>この画面をホーム画面に追加すると、受付端末で開きやすくなります。</div>
-        <button id="installButton" type="button">ホーム画面に追加</button>
-      </div>
-
       <div id="result"></div>
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbwbS83DW3v58evOq-EpOy7S4kUUoITOhwbvcVTT8J16MvREIe6cAVgpb8TghbYNGyGHcA/exec";          //GASはfsy2026福島 PWA Ver19
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbwbS83DW3v58evOq-EpOy7S4kUUoITOhwbvcVTT8J16MvREIe6cAVgpb8TghbYNGyGHcA/exec";              // fsy2026福島 PWA Ver19
+
+      // 安定運用のため、既存の Service Worker を解除
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => registration.unregister());
+        }).catch((error) => {
+          console.warn("Service Worker unregister failed:", error);
+        });
+      }
 
       let isSubmitting = false;
-      let deferredInstallPrompt = null;
 
       const button = document.getElementById("checkinButton");
       const result = document.getElementById("result");
       const offlineBadge = document.getElementById("offlineBadge");
-      const installBox = document.getElementById("installBox");
-      const installButton = document.getElementById("installButton");
 
       button.addEventListener("click", submitCheckIn);
 
@@ -334,42 +323,43 @@
           } finally {
             cleanup();
           }
-       };
+        };
 
-  function cleanup() {
-    isSubmitting = false;
-    button.disabled = false;
-    button.textContent = "チェックイン";
+        function cleanup() {
+          isSubmitting = false;
+          button.disabled = false;
+          button.textContent = "チェックイン";
 
-    if (script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
-    delete window[callbackName];
-    clearTimeout(timeoutId);
-  }
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          delete window[callbackName];
+          clearTimeout(timeoutId);
+        }
 
-  const params = new URLSearchParams({
-    api: "checkIn",
-    name: name,
-    birth: birth,
-    callback: callbackName
-  });
+        const params = new URLSearchParams({
+          api: "checkIn",
+          name: name,
+          birth: birth,
+          callback: callbackName,
+          t: Date.now().toString()
+        });
 
-  const script = document.createElement("script");
-  script.src = `${GAS_URL}?${params.toString()}`;
+        const script = document.createElement("script");
+        script.src = `${GAS_URL}?${params.toString()}`;
 
-  script.onerror = function() {
-    result.innerHTML = '<div class="panel error-box">通信エラーが発生しました。Apps Scriptの公開設定をご確認ください。</div>';
-    cleanup();
-  };
+        script.onerror = function() {
+          result.innerHTML = '<div class="panel error-box">通信エラーが発生しました。Apps Script公開設定をご確認ください。</div>';
+          cleanup();
+        };
 
-  const timeoutId = setTimeout(function() {
-    result.innerHTML = '<div class="panel error-box">応答がタイムアウトしました。Apps Scriptの再デプロイと公開設定をご確認ください。</div>';
-    cleanup();
-  }, 15000);
+        const timeoutId = setTimeout(function() {
+          result.innerHTML = '<div class="panel error-box">応答がタイムアウトしました。しばらくしてからもう一度お試しください。</div>';
+          cleanup();
+        }, 15000);
 
-  document.body.appendChild(script);
-}
+        document.body.appendChild(script);
+      }
 
       function buildNoticeHtml(note) {
         const safeNote = String(note || "").trim();
@@ -474,42 +464,6 @@
         result.innerHTML = `
           <div class="panel error-box">${escapeHtml(res.message || "該当する参加者が見つかりませんでした。")}</div>
         `;
-      }
-
-      window.addEventListener("beforeinstallprompt", function(event) {
-        event.preventDefault();
-        deferredInstallPrompt = event;
-        installBox.style.display = "block";
-      });
-
-      installButton.addEventListener("click", async function() {
-        if (!deferredInstallPrompt) return;
-
-        deferredInstallPrompt.prompt();
-        try {
-          await deferredInstallPrompt.userChoice;
-        } catch (e) {
-          console.error(e);
-        }
-
-        deferredInstallPrompt = null;
-        installBox.style.display = "none";
-      });
-
-      window.addEventListener("appinstalled", function() {
-        deferredInstallPrompt = null;
-        installBox.style.display = "none";
-      });
-
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", async function() {
-          try {
-            const registration = await navigator.serviceWorker.register("./service-worker.js");
-            console.log("Service Worker registered:", registration.scope);
-          } catch (error) {
-            console.warn("Service Worker registration failed:", error);
-          }
-        });
       }
     </script>
   </body>
