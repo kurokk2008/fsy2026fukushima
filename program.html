@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>プログラム</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --sub: #6b7280;
+        --primary: #2f80ed;
+        --primary-hover: #1c6fe0;
+        --border: #d7dee8;
+        --shadow: 0 4px 18px rgba(0,0,0,0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 16px;
+      }
+
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      .sub {
+        color: var(--sub);
+      }
+
+      .program-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .program-item {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+
+      .time {
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      .menu {
+        display: grid;
+        gap: 10px;
+      }
+
+      .menu-link {
+        display: block;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .menu-link:hover {
+        background: var(--primary-hover);
+      }
+
+      @media (max-width: 480px) {
+        .program-item {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+      }
+    </style>
+    <script src="./program-data.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1 id="programTitle">プログラム</h1>
+        <p class="sub" id="programDate">日付を読み込み中です</p>
+      </div>
+
+      <div class="card">
+        <div class="program-list" id="programList"></div>
+      </div>
+
+      <div class="card">
+        <div class="menu">
+          <a class="menu-link" href="./participant-home.html">参加者ホームへ戻る</a>
+          <a class="menu-link" href="./program.html?day=day1">1日目を見る</a>
+          <a class="menu-link" href="./program.html?day=day2">2日目を見る</a>
+          <a class="menu-link" href="./program.html?day=day3">3日目を見る</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function getDayKeyFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("day") || "day1";
+      }
+
+      function renderProgram() {
+        const dayKey = getDayKeyFromUrl();
+        const day = (window.PROGRAM_DATA?.eventDays || []).find(d => d.key === dayKey);
+
+        if (!day) {
+          document.getElementById("programTitle").textContent = "プログラムが見つかりません";
+          document.getElementById("programDate").textContent = "";
+          document.getElementById("programList").innerHTML = "<p>該当する日程がありません。</p>";
+          return;
+        }
+
+        document.getElementById("programTitle").textContent = day.title;
+        document.getElementById("programDate").textContent = `${day.label} / ${day.date}`;
+
+        document.getElementById("programList").innerHTML = day.items.map(item => `
+          <div class="program-item">
+            <div class="time">${item.time}</div>
+            <div>${item.title}</div>
+          </div>
+        `).join("");
+      }
+
+      renderProgram();
+    </script>
+  </body>
+</html>
