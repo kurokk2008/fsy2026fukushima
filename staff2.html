@@ -30,7 +30,7 @@
       }
 
       .container {
-        max-width: 980px;
+        max-width: 1200px;
         margin: 0 auto;
       }
 
@@ -127,6 +127,7 @@
 
       th {
         background: #f8fafc;
+        white-space: nowrap;
       }
 
       .message {
@@ -145,7 +146,12 @@
         color: var(--ok-text);
       }
 
-      @media (max-width: 720px) {
+      .section-title {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+
+      @media (max-width: 900px) {
         .summary {
           grid-template-columns: 1fr;
         }
@@ -212,14 +218,14 @@
       </div>
 
       <div class="card">
-        <h2>未チェックイン者一覧</h2>
+        <h2 class="section-title">未チェックイン者一覧</h2>
         <div class="row">
           <div>
-            <label for="keyword">名前検索</label>
-            <input id="keyword" placeholder="名前の一部を入力">
+            <label for="uncheckedKeyword">名前検索</label>
+            <input id="uncheckedKeyword" placeholder="名前の一部を入力">
           </div>
           <div>
-            <button id="searchButton" type="button">検索</button>
+            <button id="uncheckedSearchButton" type="button">検索</button>
           </div>
         </div>
 
@@ -228,26 +234,57 @@
             <tr>
               <th>名前</th>
               <th>生年月日</th>
+              <th>所属ステーク・地方部</th>
               <th>グループ</th>
               <th>宿泊部屋</th>
               <th>荷物置き場</th>
               <th>操作</th>
             </tr>
           </thead>
-          <tbody id="listBody"></tbody>
+          <tbody id="uncheckedListBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">受付済み一覧</h2>
+        <div class="row">
+          <div>
+            <label for="checkedKeyword">名前検索</label>
+            <input id="checkedKeyword" placeholder="名前の一部を入力">
+          </div>
+          <div>
+            <button id="checkedSearchButton" type="button">検索</button>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>生年月日</th>
+              <th>所属ステーク・地方部</th>
+              <th>グループ</th>
+              <th>宿泊部屋</th>
+              <th>荷物置き場</th>
+              <th>受付時刻</th>
+            </tr>
+          </thead>
+          <tbody id="checkedListBody"></tbody>
         </table>
       </div>
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbwqnFXxVexrsJqaOukpEMv7ndcu28OFh6vB_9wRw1ETgMM1RUrvTutZMZBf1SokI8OlAA/exec";              //GASはfsy2026福島 PWA Ver15
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbwqnFXxVexrsJqaOukpEMv7ndcu28OFh6vB_9wRw1ETgMM1RUrvTutZMZBf1SokI8OlAA/exec";                // fsy2026福島 PWA Ver15
 
       const loadButton = document.getElementById("loadButton");
-      const searchButton = document.getElementById("searchButton");
+      const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
+      const checkedSearchButton = document.getElementById("checkedSearchButton");
       const message = document.getElementById("message");
 
       loadButton.addEventListener("click", loadStaffScreen);
-      searchButton.addEventListener("click", loadUncheckedList);
+      uncheckedSearchButton.addEventListener("click", loadUncheckedList);
+      checkedSearchButton.addEventListener("click", loadCheckedInList);
 
       function showMessage(text, type = "ok") {
         message.innerHTML = `<div class="message ${type}">${escapeHtml(text)}</div>`;
@@ -266,48 +303,65 @@
           .replace(/'/g, "&#39;");
       }
 
+      function getStaffKey() {
+        return document.getElementById("staffKey").value.trim();
+      }
+
       function jsonpRequest(params) {
         return new Promise((resolve, reject) => {
           const callbackName = "jsonpCallback_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-
           params.callback = callbackName;
+
           const query = new URLSearchParams(params).toString();
+          const url = `${GAS_URL}?${query}`;
+
           const script = document.createElement("script");
-          script.src = `${GAS_URL}?${query}`;
+          script.src = url;
+
+          let finished = false;
 
           const timeoutId = setTimeout(() => {
+            if (finished) return;
+            finished = true;
             cleanup();
             reject(new Error("タイムアウトしました。"));
           }, 15000);
 
           window[callbackName] = function(res) {
+            if (finished) return;
+            finished = true;
             cleanup();
             resolve(res);
           };
 
           script.onerror = function() {
+            if (finished) return;
+            finished = true;
             cleanup();
             reject(new Error("通信エラーが発生しました。"));
           };
 
           function cleanup() {
             clearTimeout(timeoutId);
-            if (script.parentNode) script.parentNode.removeChild(script);
-            delete window[callbackName];
+            if (script.parentNode) {
+              script.parentNode.removeChild(script);
+            }
+            try {
+              delete window[callbackName];
+            } catch (e) {
+              window[callbackName] = undefined;
+            }
           }
 
           document.body.appendChild(script);
         });
       }
 
-      function getStaffKey() {
-        return document.getElementById("staffKey").value.trim();
-      }
-
       async function loadStaffScreen() {
         clearMessage();
         await loadSummary();
         await loadUncheckedList();
+        await loadCheckedInList();
       }
 
       async function loadSummary() {
@@ -338,7 +392,7 @@
 
       async function loadUncheckedList() {
         const staffKey = getStaffKey();
-        const keyword = document.getElementById("keyword").value.trim();
+        const keyword = document.getElementById("uncheckedKeyword").value.trim();
 
         if (!staffKey) {
           showMessage("スタッフキーを入力してください。", "error");
@@ -353,21 +407,48 @@
           });
 
           if (res.status !== "ok") {
-            showMessage(res.message || "一覧取得に失敗しました。", "error");
+            showMessage(res.message || "未チェックイン一覧の取得に失敗しました。", "error");
             return;
           }
 
-          renderList(res.items || []);
+          renderUncheckedList(res.items || []);
         } catch (error) {
           showMessage(error.message, "error");
         }
       }
 
-      function renderList(items) {
-        const tbody = document.getElementById("listBody");
+      async function loadCheckedInList() {
+        const staffKey = getStaffKey();
+        const keyword = document.getElementById("checkedKeyword").value.trim();
+
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "checkedInList",
+            staffKey,
+            keyword
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "受付済み一覧の取得に失敗しました。", "error");
+            return;
+          }
+
+          renderCheckedInList(res.items || []);
+        } catch (error) {
+          showMessage(error.message, "error");
+        }
+      }
+
+      function renderUncheckedList(items) {
+        const tbody = document.getElementById("uncheckedListBody");
 
         if (!items.length) {
-          tbody.innerHTML = `<tr><td colspan="6">該当者はいません。</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7">該当者はいません。</td></tr>`;
           return;
         }
 
@@ -375,15 +456,37 @@
           <tr>
             <td>${escapeHtml(item.name || "")}</td>
             <td>${escapeHtml(item.birth || "")}</td>
+            <td>${escapeHtml(item.stake || "")}</td>
             <td>${escapeHtml(item.group || "")}</td>
             <td>${escapeHtml(item.room || "")}</td>
             <td>${escapeHtml(item.baggage || "")}</td>
             <td>
               <button class="small" type="button"
-                onclick="manualCheckIn('${escapeHtml(item.name || "")}', '${escapeHtml(item.birth || "")}')">
+                onclick="manualCheckIn('${String(item.name || "").replace(/'/g, "\\'")}', '${String(item.birth || "").replace(/'/g, "\\'")}')">
                 手動チェックイン
               </button>
             </td>
+          </tr>
+        `).join("");
+      }
+
+      function renderCheckedInList(items) {
+        const tbody = document.getElementById("checkedListBody");
+
+        if (!items.length) {
+          tbody.innerHTML = `<tr><td colspan="7">該当者はいません。</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = items.map(item => `
+          <tr>
+            <td>${escapeHtml(item.name || "")}</td>
+            <td>${escapeHtml(item.birth || "")}</td>
+            <td>${escapeHtml(item.stake || "")}</td>
+            <td>${escapeHtml(item.group || "")}</td>
+            <td>${escapeHtml(item.room || "")}</td>
+            <td>${escapeHtml(item.baggage || "")}</td>
+            <td>${escapeHtml(item.checkedInAt || "")}</td>
           </tr>
         `).join("");
       }
@@ -411,6 +514,7 @@
             showMessage(res.message || "処理が完了しました。", "ok");
             await loadSummary();
             await loadUncheckedList();
+            await loadCheckedInList();
             return;
           }
 
@@ -419,15 +523,6 @@
           showMessage(error.message, "error");
         }
       }
-
-      // 30秒毎にstaff画面の一覧を更新するインターバルの設定
-      
-      setInterval(() => {
-        if (getStaffKey()) {
-          loadSummary();
-          loadUncheckedList();
-        }
-      }, 30000);
     </script>
   </body>
 </html>
