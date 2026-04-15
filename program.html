@@ -105,6 +105,17 @@
           text-align: left;
         }
       }
+
+      /* 戻るボタン（グレー） */
+      .menu-link.back {
+        background: #6b7280;
+        font-weight: normal;
+      }
+
+      .menu-link.back:hover {
+        background: #4b5563;
+      }
+      
     </style>
     <script src="./program-data.js"></script>
   </head>
@@ -121,7 +132,7 @@
 
       <div class="card">
         <div class="menu">
-          <a class="menu-link" href="./participant-home.html">参加者ホームへ戻る</a>
+          <a class="menu-link back" href="./participant-home.html">← 参加者ホームへ戻る</a>
           <a class="menu-link" href="./program.html?day=day1">1日目を見る</a>
           <a class="menu-link" href="./program.html?day=day2">2日目を見る</a>
           <a class="menu-link" href="./program.html?day=day3">3日目を見る</a>
