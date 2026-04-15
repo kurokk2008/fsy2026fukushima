@@ -101,6 +101,27 @@
           padding: 14px;
         }
       }
+
+      /* 戻るボタン */
+      .menu-link {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: bold;
+        text-decoration: none;
+        color: #fff;
+        background: #2f80ed;
+      }
+
+      .menu-link.back {
+        background: #6b7280;
+      }
+
+      .menu-link.back:hover {
+        background: #4b5563;
+      }
+      
     </style>
   </head>
   <body>
@@ -126,8 +147,14 @@
         <p>・受付で案内された部屋番号を確認してください。</p>
         <p>・建物名や棟番号を先に確認すると見つけやすくなります。</p>
         <p>・荷物置き場は別ページで確認できます。</p>
-        <a class="back" href="./participant-home.html">← 参加者ホームへ戻る</a>
       </div>
+
+      <div class="card">
+        <a class="menu-link back" href="./participant-home.html">
+          ← 参加者ホームへ戻る
+        </a>
+      </div>
+      
     </div>
   </body>
 </html>
