@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>施設全体マップ</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #f4f7fb;
+        padding: 16px;
+      }
+
+      .card {
+        max-width: 800px;
+        margin: 0 auto 16px;
+        background: #fff;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      .map-wrap {
+        overflow: auto;
+        border-radius: 10px;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+
+      .back {
+        display: block;
+        margin-top: 12px;
+        text-align: center;
+        color: #2f80ed;
+        font-weight: bold;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h1>施設全体マップ</h1>
+      <p>施設の全体配置はこちらで確認できます。</p>
+      <p>ピンチ操作で拡大できます。</p>
+    </div>
+
+    <div class="card">
+      <div class="map-wrap">
+        <img src="./maps/site-map.jpg" alt="施設全体マップ">
+      </div>
+    </div>
+
+    <div class="card">
+      <a class="back" href="./participant-home.html">参加者ホームへ戻る</a>
+    </div>
+  </body>
+</html>
