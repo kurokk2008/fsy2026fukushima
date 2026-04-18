@@ -680,6 +680,8 @@ listEl.innerHTML = todayData.items.map((item, index) => {
     }
 
     document.getElementById("announcementTitle").textContent = res.title || "";
+    document.getElementById("announcementBody").innerHTML = formatAnnouncementBody(res.body || "");
+    
     function escapeHtml(value) {
        return String(value ?? "")
          .replace(/&/g, "&amp;")
