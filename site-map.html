@@ -79,12 +79,41 @@
 
       .map-marker {
         position: absolute;
-        transform: translate(-50%, -100%);
-        font-size: 28px;
-        line-height: 1;
-        color: #e53935;
-        text-shadow: 0 0 6px rgba(255,255,255,0.9);
+        transform: translate(-50%, -50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #e53935;
+        border: 3px solid #ffffff;
+        box-shadow: 0 0 0 4px rgba(229,57,53,0.25);
         pointer-events: none;
+        animation: pulse 1.6s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(229,57,53,0.45);
+        }
+        70% {
+          box-shadow: 0 0 0 14px rgba(229,57,53,0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(229,57,53,0);
+        }
+      }
+
+      .marker-label {
+        position: absolute;
+        top: -34px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #e53935;
+        color: #fff;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
       }
       
     </style>
@@ -108,7 +137,9 @@
 <div class="card">
   <div class="map-wrap map-area">
     <img id="siteMapImage" src="./maps/site-map.jpg" alt="施設全体マップ">
-    <div id="currentLocationMarker" class="map-marker" hidden>●</div>
+    <div id="currentLocationMarker" class="map-marker" hidden>
+      <span class="marker-label">現在地</span>
+    </div>
   </div>
 </div>
 
