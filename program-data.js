@@ -3,7 +3,7 @@ window.PROGRAM_DATA = {
     {
       key: "day1",
       label: "1日目",
-      date: "2026-05-04（月）",
+      date: "2026-05-04",
       title: "事前合宿1日目プログラム",
       items: [
         { time: "10:30-11:00", title: "集合", place: "新白河駅" },
@@ -24,7 +24,7 @@ window.PROGRAM_DATA = {
     {
       key: "day2",
       label: "2日目",
-      date: "2026-05-05（火）",
+      date: "2026-05-05",
       title: "事前合宿2日目プログラム",
       items: [
         { time: "6:30", title: "起床", place: "" },
@@ -46,7 +46,7 @@ window.PROGRAM_DATA = {
     {
       key: "day3",
       label: "3日目",
-      date: "2026-05-06（水）",
+      date: "2026-05-06",
       title: "事前合宿3日目プログラム",
       items: [
         { time: "6:30", title: "起床", place: "" },
