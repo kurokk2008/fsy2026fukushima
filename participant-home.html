@@ -94,6 +94,26 @@
         margin: 8px 0;
       }
 
+      .location-select {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        margin-top: 8px;
+      }
+
+      .location-save {
+        border: none;
+        cursor: pointer;
+        background: #f39c12;
+      }
+
+      .location-save:hover {
+        background: #d68910;
+      }
+
       ul {
         margin: 0;
         padding-left: 20px;
@@ -154,6 +174,36 @@
           <div class="info-row"><strong>合宿グループ：</strong><span id="userGroup">未設定</span></div>
           <div class="info-row"><strong>宿泊部屋：</strong><span id="userRoom">未設定</span></div>
           <div class="info-row"><strong>荷物置き場：</strong><span id="userBaggage">未設定</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>現在地</h2>
+        <div class="info-box">
+          <div class="info-row">
+            <label for="currentLocationSelect"><strong>今いる場所を選んでください</strong></label>
+            <select id="currentLocationSelect" class="location-select">
+              <option value="">選択してください</option>
+              <option value="受付">受付</option>
+              <option value="新白河駅">新白河駅</option>
+              <option value="プレイホール">プレイホール</option>
+              <option value="食堂">食堂</option>
+              <option value="ラジオ体操広場">ラジオ体操広場</option>
+              <option value="エコルーム２">エコルーム２</option>
+              <option value="宿泊棟入口">宿泊棟入口</option>
+              <option value="荷物置き場">荷物置き場</option>
+            </select>
+          </div>
+
+          <div class="info-row">
+            <button id="saveLocationButton" type="button" class="menu-link location-save">
+              現在地を保存する
+            </button>
+          </div>
+
+          <div class="info-row">
+              <strong>保存中の現在地：</strong><span id="currentLocationText">未設定</span>
+          </div>
         </div>
       </div>
 
@@ -246,6 +296,34 @@
     document.getElementById("userBaggage").textContent = safeGet("participant_baggage");
 
     renderTodayProgram();
+    
+    function saveCurrentLocation() {
+      const select = document.getElementById("currentLocationSelect");
+      const value = select.value || "";
+
+      if (!value) {
+        alert("現在地を選択してください。");
+        return;
+      }
+
+      localStorage.setItem("participant_current_location", value);
+      renderCurrentLocation();
+    }
+
+    function renderCurrentLocation() {
+      const currentLocation = localStorage.getItem("participant_current_location") || "未設定";
+      document.getElementById("currentLocationText").textContent = currentLocation;
+
+      const select = document.getElementById("currentLocationSelect");
+      if (currentLocation !== "未設定") {
+        select.value = currentLocation;
+      }
+    }
+
+    document.getElementById("saveLocationButton").addEventListener("click", saveCurrentLocation);
+
+    renderCurrentLocation();
+
   </script>
   </body>
 </html>
