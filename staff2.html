@@ -448,6 +448,7 @@
         await loadSummary();
         await loadUncheckedList();
         await loadCheckedInList();
+        await loadAnnouncement();
       }
 
       async function loadSummary() {
@@ -680,6 +681,7 @@
           loadSummary();
           loadUncheckedList();
           loadCheckedInList();
+          loadAnnouncement();
         }
     }, 30000);
       
