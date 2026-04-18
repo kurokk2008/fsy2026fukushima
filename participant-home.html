@@ -532,6 +532,9 @@
      ========================= */
 
   function renderTodayProgram() {
+    console.log("effective.dateYmd =", effective.dateYmd);
+    console.log("program dates =", days.map(day => day.date));
+    
     const effective = getEffectiveDateTime();
     const days = window.PROGRAM_DATA?.eventDays || [];
     const todayData = days.find(day => day.date === effective.dateYmd);
@@ -545,8 +548,8 @@
     }
 
     if (!todayData) {
-      titleEl.textContent = "本日のプログラムは未設定です。";
-      listEl.innerHTML = '<p class="sub">下のリンクから各日のプログラムを確認してください。</p>';
+      titleEl.textContent = `プログラム未設定（判定日: ${effective.dateYmd}）`;
+      listEl.innerHTML = '<p class="sub">program-data.js の date と、テスト日付が一致しているか確認してください。</p>';
       return;
     }
 
