@@ -57,14 +57,6 @@
         background: #2f80ed;
       }
 
-      .menu-link.back {
-        background: #6b7280;
-      }
-
-      .menu-link.back:hover {
-        background: #4b5563;
-      }
-
       .info-box {
         background: #f8fafc;
         border: 1px solid #d7dee8;
@@ -98,8 +90,35 @@
       
     </style>
   </head>
+ 
+  <body>
+    <div class="card">
+      <h1>施設全体マップ</h1>
+      <p>施設の全体配置はこちらで確認できます。</p>
+      <p>ピンチ操作で拡大できます。</p>
+    </div>
 
-  <script>
+    <div class="card">
+      <h2>現在地の案内</h2>
+      <div class="info-box">
+        <div class="info-row"><strong>現在地：</strong><span id="currentLocationText">未設定</span></div>
+        <div class="info-row"><strong>案内：</strong><span id="currentLocationGuide">参加者ホームで現在地を選択してください。</span></div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="map-wrap">
+        <img src="./maps/site-map.jpg" alt="施設全体マップ">
+      </div>
+    </div>
+
+    <div class="card">
+      <a class="menu-link back" href="./participant-home.html">
+        ← 参加者ホームへ戻る
+      </a>
+    </div>
+
+    <script>
       function getLocationGuide(location) {
         switch (location) {
           case "受付":
@@ -131,32 +150,6 @@
 
       renderCurrentLocation();
   </script>
-  
-  <body>
-    <div class="card">
-      <h1>施設全体マップ</h1>
-      <p>施設の全体配置はこちらで確認できます。</p>
-      <p>ピンチ操作で拡大できます。</p>
-    </div>
-
-    <div class="card">
-      <h2>現在地の案内</h2>
-      <div class="info-box">
-        <div class="info-row"><strong>現在地：</strong><span id="currentLocationText">未設定</span></div>
-        <div class="info-row"><strong>案内：</strong><span id="currentLocationGuide">参加者ホームで現在地を選択してください。</span></div>
-      </div>
-    </div>
     
-    <div class="card">
-      <div class="map-wrap">
-        <img src="./maps/site-map.jpg" alt="施設全体マップ">
-      </div>
-    </div>
-
-    <div class="card">
-      <a class="menu-link back" href="./participant-home.html">
-        ← 参加者ホームへ戻る
-      </a>
-    </div>
   </body>
 </html>
