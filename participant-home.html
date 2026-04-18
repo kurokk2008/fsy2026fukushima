@@ -362,6 +362,7 @@
      false = テストUIを非表示
      ========================= */
   const ENABLE_PROGRAM_TEST_UI = false;
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxTU93yEqP5B50LO7aOW4BO25CzOKOeOgWp5ZrrAd4TJhYk_RjT-_0tWiUmDHF6wiI9ug/exec";  //fsy2026福島 PWA Ver25
 
   function safeGet(key) {
     return localStorage.getItem(key) || "未設定";
@@ -686,7 +687,9 @@ listEl.innerHTML = todayData.items.map((item, index) => {
       resolve(res);
     };
 
-    script.onerror = reject;
+    script.onerror = function() {
+      reject(new Error("通信エラーが発生しました。"));
+    };
 
     document.body.appendChild(script);
   });
