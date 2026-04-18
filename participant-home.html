@@ -228,7 +228,22 @@
 .test-button:hover {
   background: #4b5563;
 }
-     
+
+#announcementBody p {
+  margin: 0 0 8px 0;
+  line-height: 1.7;
+}
+
+#announcementBody ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#announcementBody li {
+  margin: 6px 0;
+  line-height: 1.7;
+}
+      
     </style>
   </head>
   <body>
@@ -665,8 +680,35 @@ listEl.innerHTML = todayData.items.map((item, index) => {
     }
 
     document.getElementById("announcementTitle").textContent = res.title || "";
-    document.getElementById("announcementBody").textContent = res.body || "";
-  } catch (e) {
+    function escapeHtml(value) {
+       return String(value ?? "")
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatAnnouncementBody(body) {
+      const lines = String(body || "")
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line !== "");
+
+      const isBulletList = lines.every(line =>
+        line.startsWith("・") || line.startsWith("-") || line.startsWith("●")
+      );
+
+      if (isBulletList && lines.length > 0) {
+        return `<ul>${lines.map(line => {
+          const item = line.replace(/^[・\-●]\s*/, "");
+          return `<li>${escapeHtml(item)}</li>`;
+        }).join("")}</ul>`;
+      }
+
+      return lines.map(line => `<p>${escapeHtml(line)}</p>`).join("");
+    }
+    } catch (e) {
     document.getElementById("announcementBody").textContent = "お知らせの取得に失敗しました。";
   }
 }
