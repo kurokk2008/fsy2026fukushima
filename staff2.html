@@ -181,6 +181,61 @@
           padding: 6px 0;
         }
       }
+
+      .form-row {
+        margin-bottom: 12px;
+      }
+
+      .text-input,
+      .text-area {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #d7dee8;
+        border-radius: 10px;
+        background: #fff;
+        box-sizing: border-box;
+      }
+
+      .text-area {
+        resize: vertical;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .action-button {
+        border: none;
+        cursor: pointer;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        background: #6b7280;
+        color: #fff;
+      }
+
+      .action-button:hover {
+        background: #4b5563;
+      }
+
+      .primary-button {
+        background: #2f80ed;
+      }
+
+      .primary-button:hover {
+        background: #1c6fe0;
+      }
+
+      .info-box {
+        background: #f8fafc;
+        border: 1px solid #d7dee8;
+        border-radius: 12px;
+        padding: 14px;
+      }
+      
     </style>
   </head>
   <body>
@@ -214,6 +269,37 @@
             <div class="label">未受付</div>
             <div class="value" id="uncheckedCount">-</div>
           </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>お知らせ管理</h2>
+
+        <div class="form-row">
+          <label for="announcementTitle"><strong>タイトル</strong></label>
+          <input id="announcementTitle" type="text" class="text-input" placeholder="例：本日のお知らせ">
+        </div>
+
+        <div class="form-row">
+          <label for="announcementBody"><strong>本文</strong></label>
+          <textarea id="announcementBody" class="text-area" rows="5" placeholder="参加者ホームに表示する本文"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="announcementVisible"><strong>表示状態</strong></label>
+          <select id="announcementVisible" class="text-input">
+            <option value="表示">表示</option>
+            <option value="非表示">非表示</option>
+          </select>
+        </div>
+
+        <div class="button-row">
+          <button id="loadAnnouncementButton" type="button" class="action-button">現在内容を読み込み</button>
+          <button id="saveAnnouncementButton" type="button" class="action-button primary-button">お知らせを保存</button>
+        </div>
+
+        <div class="info-box" style="margin-top: 12px;">
+          <div><strong>現在の参加者向け表示状態：</strong><span id="announcementStatusText">未取得</span></div>
         </div>
       </div>
 
@@ -523,7 +609,72 @@
           showMessage(error.message, "error");
         }
       }
-    
+
+      async function loadAnnouncement() {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "getAnnouncement",
+            staffKey
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "お知らせの取得に失敗しました。", "error");
+            return;
+          }
+
+          document.getElementById("announcementTitle").value = res.title || "";
+          document.getElementById("announcementBody").value = res.body || "";
+          document.getElementById("announcementVisible").value = res.rawVisible || "表示";
+          document.getElementById("announcementStatusText").textContent =
+            res.visible ? "参加者ホームに表示中" : "参加者ホームでは非表示";
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+      async function saveAnnouncement() {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        const title = document.getElementById("announcementTitle").value || "";
+        const body = document.getElementById("announcementBody").value || "";
+        const visible = document.getElementById("announcementVisible").value || "表示";
+
+        try {
+          const res = await jsonpRequest({
+            api: "saveAnnouncement",
+            staffKey,
+            title,
+            body,
+            visible
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "お知らせの保存に失敗しました。", "error");
+            return;
+          }
+
+          document.getElementById("announcementStatusText").textContent =
+            visible === "表示" ? "参加者ホームに表示中" : "参加者ホームでは非表示";
+
+          showMessage(res.message || "お知らせを保存しました。", "ok");
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+    document.getElementById("loadAnnouncementButton").addEventListener("click", loadAnnouncement);
+    document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
+      
     setInterval(() => {
         if (getStaffKey()) {
           loadSummary();
