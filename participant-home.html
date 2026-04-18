@@ -162,12 +162,21 @@
 }
 
 .program-item.current {
-  background: #fff3cd;
-  border: 2px solid #f39c12;
+  background: #e8f5e9;      /* 薄緑 */
+  border: 2px solid #43a047;
 }
 
 .program-item.current .program-time {
-  color: #b26a00;
+  color: #2e7d32;
+}
+
+.program-item.next {
+  background: #fff8dc;      /* 薄黄色 */
+  border: 2px solid #f4b400;
+}
+
+.program-item.next .program-time {
+  color: #a66b00;
 }
 
 .program-time {
@@ -446,6 +455,37 @@
     return currentMinutes >= range.start && currentMinutes < end;
   }
 
+function getProgramStatus(item, currentHm, nextItem) {
+  const currentMinutes = hmToMinutes(currentHm);
+  if (currentMinutes === null) return "normal";
+
+  const range = parseTimeRange(item.time);
+  if (!range || range.start === null) return "normal";
+
+  let end = range.end;
+
+  if (!String(item.time).includes("-") && nextItem) {
+    const nextRange = parseTimeRange(nextItem.time);
+    if (nextRange && nextRange.start !== null) {
+      end = nextRange.start;
+    }
+  }
+
+  if (end === null || end === undefined) {
+    end = range.start + 60;
+  }
+
+  if (currentMinutes >= range.start && currentMinutes < end) {
+    return "current";
+  }
+
+  if (currentMinutes < range.start) {
+    return "next";
+  }
+
+  return "normal";
+}
+  
   /* =========================
      TEST DATETIME CONTROL START
      localStorage:
@@ -550,25 +590,49 @@
 
     if (!todayData) {
       titleEl.textContent = `プログラム未設定（判定日: ${effective.dateYmd}）`;
-      listEl.innerHTML = '<p class="sub">program-data.js の date と、テスト日付が一致しているか確認してください。</p>';
+
+      if (effective.isTest) {
+        listEl.innerHTML = '<p class="sub">program-data.js の date と、テスト日付が一致しているか確認してください。</p>';
+      } else {
+        listEl.innerHTML = '<p class="sub">本日のプログラムは未登録です。</p>';
+      }
+
       return;
     }
 
     titleEl.textContent = `${todayData.label} / ${todayData.date}`;
 
-    listEl.innerHTML = todayData.items.map((item, index) => {
-      const nextItem = todayData.items[index + 1] || null;
-      const currentClass = isCurrentProgram(item, effective.timeHm, nextItem) ? " current" : "";
-      const placeHtml = item.place ? `<div class="program-place">${item.place}</div>` : "";
+const currentIndex = todayData.items.findIndex((item, index) => {
+  const nextItem = todayData.items[index + 1] || null;
+  return isCurrentProgram(item, effective.timeHm, nextItem);
+});
 
-      return `
-        <div class="program-item${currentClass}">
-          <div class="program-time">${item.time}</div>
-          <div>${item.title}</div>
-          ${placeHtml}
-        </div>
-      `;
-    }).join("");
+const nextIndex = currentIndex >= 0
+  ? currentIndex + 1
+  : todayData.items.findIndex(item => {
+      const range = parseTimeRange(item.time);
+      const currentMinutes = hmToMinutes(effective.timeHm);
+      return range && range.start !== null && currentMinutes < range.start;
+    });
+
+listEl.innerHTML = todayData.items.map((item, index) => {
+  const placeHtml = item.place ? `<div class="program-place">${item.place}</div>` : "";
+
+  let className = "";
+  if (index === currentIndex) {
+    className = " current";
+  } else if (index === nextIndex) {
+    className = " next";
+  }
+
+  return `
+    <div class="program-item${className}">
+      <div class="program-time">${item.time}</div>
+      <div>${item.title}</div>
+      ${placeHtml}
+    </div>
+  `;
+}).join("");
   }
 
   function saveCurrentLocation() {
