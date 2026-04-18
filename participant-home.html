@@ -455,7 +455,7 @@
   function getEffectiveDateTime() {
     const testDate = localStorage.getItem("participant_test_date");
     const testTime = localStorage.getItem("participant_test_time");
-
+    
     if (testDate && testTime) {
       return {
         dateYmd: testDate,
@@ -531,12 +531,13 @@
      TEST DATETIME CONTROL END
      ========================= */
 
-  function renderTodayProgram() {
+  function renderTodayProgram() {  
+    const effective = getEffectiveDateTime();
+    const days = window.PROGRAM_DATA?.eventDays || [];
+
     console.log("effective.dateYmd =", effective.dateYmd);
     console.log("program dates =", days.map(day => day.date));
     
-    const effective = getEffectiveDateTime();
-    const days = window.PROGRAM_DATA?.eventDays || [];
     const todayData = days.find(day => day.date === effective.dateYmd);
 
     const titleEl = document.getElementById("todayProgramTitle");
