@@ -8,7 +8,8 @@ window.PROGRAM_DATA = {
       items: [
         { time: "10:30-11:00", title: "集合", place: "新白河駅" },
         { time: "11:00", title: "バス出発時間", place: "新白河駅" },
-        { time: "12:00-12:40", title: "昼食", place: "レストラン" },
+        { time: "11:50-12:30", title: "昼食", place: "レストラン" },
+        { time: "12:30-13:00", title: "入所オリエンテーション", place: "プレイホール" },
         { time: "13:00", title: "開会", place: "プレイホール" },
         { time: "13:15-14:30", title: "キム長老ディボーショナル", place: "プレイホール" },
         { time: "14:45-16:00", title: "カウンセラーに会う/交流会", place: "プレイホール" },
@@ -17,7 +18,7 @@ window.PROGRAM_DATA = {
         { time: "17:15-18:00", title: "家庭の夕べ", place: "プレイホール" },
         { time: "18:15-18:45", title: "目標設定", place: "プレイホール" },
         { time: "18:50-19:30", title: "夕食", place: "レストラン" },
-        { time: "19:40-21:00", title: "お風呂", place: "" }
+        { time: "19:40-21:00", title: "お風呂", place: "大浴場、または中浴場" }
       ]
     },
     {
@@ -29,18 +30,17 @@ window.PROGRAM_DATA = {
         { time: "6:30", title: "起床", place: "" },
         { time: "7:00-7:15", title: "朝のつどい", place: "ラジオ体操広場" },
         { time: "7:20-8:00", title: "セミナリーみたいな、ACグループでやってみよう", place: "" },
-        { time: "8:15-9:00", title: "朝食", place: "レストラン" },
-        { time: "9:15-10:00", title: "モーニングディボーショナル", place: "エコルーム２" },
+        { time: "8:00-8:40", title: "朝食", place: "レストラン" },
+        { time: "8:45-10:00", title: "モーニングディボーショナル", place: "エコルーム２" },
         { time: "10:00-11:45", title: "全体の流れ確認", place: "エコルーム２" },
-        { time: "12:00-12:40", title: "昼食", place: "レストラン" },
-        { time: "13:00-13:30", title: "YMYWの活動", place: "プレイホール" },
+        { time: "11:50-12:30", title: "昼食", place: "レストラン" },
+        { time: "12:45-13:30", title: "YMYWの活動", place: "プレイホール" },
         { time: "13:45-14:45", title: "ゲームナイト", place: "プレイホール" },
         { time: "15:00-16:30", title: "ダンス", place: "プレイホール" },
         { time: "16:45-17:00", title: "夕べの集い", place: "ラジオ体操広場" },
-        { time: "17:30-18:15", title: "夕食", place: "レストラン" },
-        { time: "18:15-18:45", title: "写真撮影", place: "プレイホール" },
-        { time: "18:45-19:30", title: "バラエティショー", place: "プレイホール" },
-        { time: "20:00-21:20", title: "お風呂", place: "" }
+        { time: "17:10-17:50", title: "夕食", place: "レストラン" },
+        { time: "18:00-19:00", title: "バラエティショー", place: "プレイホール" },
+        { time: "19:15-19:55", title: "お風呂", place: "大浴場、または中浴場" }
       ]
     },
     {
@@ -51,8 +51,8 @@ window.PROGRAM_DATA = {
       items: [
         { time: "6:30", title: "起床", place: "" },
         { time: "7:20-8:00", title: "チェックアウト・掃除", place: "各宿泊部屋" },
-        { time: "8:15-9:00", title: "朝食", place: "レストラン" },
-        { time: "9:30-10:30", title: "証会", place: "エコルーム２" },
+        { time: "8:00-8:45", title: "朝食", place: "レストラン" },
+        { time: "9:15-10:30", title: "証会", place: "エコルーム２" },
         { time: "10:45-11:45", title: "福音に従って生活する・青少年の強さのために", place: "エコルーム２" },
         { time: "12:15-13:00", title: "昼食", place: "レストラン" },
         { time: "13:15-14:15", title: "家に持ち帰ろう", place: "エコルーム２" },
