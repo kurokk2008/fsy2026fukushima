@@ -64,10 +64,74 @@
       .menu-link.back:hover {
         background: #4b5563;
       }
+
+      .info-box {
+        background: #f8fafc;
+        border: 1px solid #d7dee8;
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .info-row {
+        margin: 8px 0;
+        line-height: 1.7;
+      }
+
+      .menu-link {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: bold;
+        text-decoration: none;
+        color: #fff;
+        background: #2f80ed;
+      }
+
+      .menu-link.back {
+        background: #6b7280;
+      }
+
+      .menu-link.back:hover {
+        background: #4b5563;
+      }
       
     </style>
   </head>
 
+  <script>
+      function getLocationGuide(location) {
+        switch (location) {
+          case "受付":
+            return "受付付近にいます。まずは施設全体マップで建物の位置関係を確認してください。";
+          case "新白河駅":
+            return "新白河駅付近です。集合・解散場所の確認に使ってください。";
+          case "プレイホール":
+            return "プレイホール付近にいます。次のプログラムや集合案内を確認してください。";
+          case "食堂":
+            return "食堂付近にいます。次の移動先を施設全体マップで確認してください。";
+          case "ラジオ体操広場":
+            return "ラジオ体操広場付近にいます。集合場所の位置確認にご利用ください。";
+          case "エコルーム２":
+            return "エコルーム２付近にいます。次のプログラム場所も確認してください。";
+          case "宿泊棟入口":
+            return "宿泊棟入口にいます。宿泊部屋の地図も合わせて確認すると分かりやすいです。";
+          case "荷物置き場":
+            return "荷物置き場付近にいます。宿泊部屋や次の集合場所も確認してください。";
+          default:
+            return "参加者ホームで現在地を選択してください。";
+        }
+      }
+
+      function renderCurrentLocation() {
+        const location = localStorage.getItem("participant_current_location") || "未設定";
+        document.getElementById("currentLocationText").textContent = location;
+        document.getElementById("currentLocationGuide").textContent = getLocationGuide(location);
+      }
+
+      renderCurrentLocation();
+  </script>
+  
   <body>
     <div class="card">
       <h1>施設全体マップ</h1>
@@ -75,6 +139,14 @@
       <p>ピンチ操作で拡大できます。</p>
     </div>
 
+    <div class="card">
+      <h2>現在地の案内</h2>
+      <div class="info-box">
+        <div class="info-row"><strong>現在地：</strong><span id="currentLocationText">未設定</span></div>
+        <div class="info-row"><strong>案内：</strong><span id="currentLocationGuide">参加者ホームで現在地を選択してください。</span></div>
+      </div>
+    </div>
+    
     <div class="card">
       <div class="map-wrap">
         <img src="./maps/site-map.jpg" alt="施設全体マップ">
