@@ -152,6 +152,73 @@
       .menu-link.map:hover {
         background: #1e8e4d;
       }
+
+      .program-item {
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin: 8px 0;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+      }
+
+      .program-item.current {
+        background: #fff3cd;
+        border: 2px solid #f39c12;
+      }
+
+      .program-item.current .program-time {
+        color: #b26a00;
+      }
+
+      .program-time {
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      .program-place {
+        color: var(--sub);
+        font-size: 13px;
+        margin-top: 2px;
+      }    
+
+      .test-box {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .test-row {
+        margin: 8px 0;
+      }
+
+      .test-time-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .test-button-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .test-button {
+        border: none;
+        cursor: pointer;
+        background: #6b7280;
+      }
+
+      .test-button:hover {
+        background: #4b5563;
+      }
+     
     </style>
   </head>
   <body>
@@ -232,7 +299,21 @@
         <h2>今日のプログラム</h2>
         <div class="info-box">
           <p id="todayProgramTitle">本日のプログラムを読み込み中です。</p>
+          <div class="info-row"><strong>判定時刻：</strong><span id="programNowText">--:--</span></div>
           <div id="todayProgramList"></div>
+
+          <div class="test-box">
+            <div class="test-row">
+              <strong>テスト用時刻</strong>
+            </div>
+            <div class="test-row">
+              <input id="testTimeInput" class="test-time-input" type="time">
+            </div>
+            <div class="test-button-row">
+              <button id="applyTestTimeButton" type="button" class="menu-link test-button">テスト時刻を適用</button>
+              <button id="resetTestTimeButton" type="button" class="menu-link test-button">現在時刻に戻す</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -259,75 +340,191 @@
   　    </div>
       </div>
    </div>
-   <script>
-    function safeGet(key) {
-      return localStorage.getItem(key) || "未設定";
+    
+  <script>
+  function safeGet(key) {
+    return localStorage.getItem(key) || "未設定";
+  }
+
+  function getTodayYmdInJst() {
+    const now = new Date();
+    const jst = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const yyyy = jst.getFullYear();
+    const mm = String(jst.getMonth() + 1).padStart(2, "0");
+    const dd = String(jst.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function getCurrentHmInJst() {
+    const now = new Date();
+    const jst = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const hh = String(jst.getHours()).padStart(2, "0");
+    const mm = String(jst.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+
+  function hmToMinutes(hm) {
+    const parts = String(hm || "").split(":");
+    if (parts.length !== 2) return null;
+
+    const h = Number(parts[0]);
+    const m = Number(parts[1]);
+
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return h * 60 + m;
+  }
+
+  function parseTimeRange(timeText) {
+    const text = String(timeText || "").trim();
+    if (!text) return null;
+
+    if (text.includes("-")) {
+      const [start, end] = text.split("-").map(s => s.trim());
+      return {
+        start: hmToMinutes(start),
+        end: hmToMinutes(end)
+      };
     }
 
-    function getTodayYmdInJst() {
-      const now = new Date();
-      const jst = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-      const yyyy = jst.getFullYear();
-      const mm = String(jst.getMonth() + 1).padStart(2, "0");
-      const dd = String(jst.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
+    const start = hmToMinutes(text);
+    if (start === null) return null;
 
-    function renderTodayProgram() {
-      const today = getTodayYmdInJst();
-      const days = window.PROGRAM_DATA?.eventDays || [];
-      const todayData = days.find(day => day.date === today);
+    return {
+      start,
+      end: start + 60
+    };
+  }
 
-      const titleEl = document.getElementById("todayProgramTitle");
-      const listEl = document.getElementById("todayProgramList");
+  function isCurrentProgram(item, currentHm, nextItem) {
+    const currentMinutes = hmToMinutes(currentHm);
+    if (currentMinutes === null) return false;
 
-      if (!todayData) {
-        titleEl.textContent = "本日のプログラムは未設定です。";
-        listEl.innerHTML = '<p class="sub">下のリンクから各日のプログラムを確認してください。</p>';
-        return;
+    const range = parseTimeRange(item.time);
+    if (!range || range.start === null) return false;
+
+    let end = range.end;
+
+    if (!String(item.time).includes("-") && nextItem) {
+      const nextRange = parseTimeRange(nextItem.time);
+      if (nextRange && nextRange.start !== null) {
+        end = nextRange.start;
       }
-
-      titleEl.textContent = `${todayData.label} / ${todayData.date}`;
-
-      listEl.innerHTML = todayData.items.map(item => `
-        <div class="info-row"><strong>${item.time}</strong>　${item.title}</div>
-      `).join("");
     }
 
-    document.getElementById("userName").textContent = safeGet("participant_name");
-    document.getElementById("userGroup").textContent = safeGet("participant_group");
-    document.getElementById("userRoom").textContent = safeGet("participant_room");
-    document.getElementById("userBaggage").textContent = safeGet("participant_baggage");
+    if (end === null || end === undefined) {
+      end = range.start + 60;
+    }
+
+    return currentMinutes >= range.start && currentMinutes < end;
+  }
+
+  function getEffectiveProgramTime() {
+    const testValue = localStorage.getItem("participant_test_time");
+    return testValue || getCurrentHmInJst();
+  }
+
+  function renderTodayProgram() {
+    const today = getTodayYmdInJst();
+    const days = window.PROGRAM_DATA?.eventDays || [];
+    const todayData = days.find(day => day.date === today);
+
+    const titleEl = document.getElementById("todayProgramTitle");
+    const listEl = document.getElementById("todayProgramList");
+    const nowTextEl = document.getElementById("programNowText");
+
+    const effectiveHm = getEffectiveProgramTime();
+
+    if (nowTextEl) {
+      nowTextEl.textContent = effectiveHm;
+    }
+
+    if (!todayData) {
+      titleEl.textContent = "本日のプログラムは未設定です。";
+      listEl.innerHTML = '<p class="sub">下のリンクから各日のプログラムを確認してください。</p>';
+      return;
+    }
+
+    titleEl.textContent = `${todayData.label} / ${todayData.date}`;
+
+    listEl.innerHTML = todayData.items.map((item, index) => {
+      const nextItem = todayData.items[index + 1] || null;
+      const currentClass = isCurrentProgram(item, effectiveHm, nextItem) ? " current" : "";
+      const placeHtml = item.place ? `<div class="program-place">${item.place}</div>` : "";
+
+      return `
+        <div class="program-item${currentClass}">
+          <div class="program-time">${item.time}</div>
+          <div>${item.title}</div>
+          ${placeHtml}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function applyTestTime() {
+    const input = document.getElementById("testTimeInput");
+    if (!input || !input.value) {
+      alert("テスト時刻を入力してください。");
+      return;
+    }
+
+    localStorage.setItem("participant_test_time", input.value);
+    renderTodayProgram();
+  }
+
+  function resetTestTime() {
+    localStorage.removeItem("participant_test_time");
+
+    const input = document.getElementById("testTimeInput");
+    if (input) {
+      input.value = "";
+    }
 
     renderTodayProgram();
-    
-    function saveCurrentLocation() {
-      const select = document.getElementById("currentLocationSelect");
-      const value = select.value || "";
+  }
 
-      if (!value) {
-        alert("現在地を選択してください。");
-        return;
-      }
+  function saveCurrentLocation() {
+    const select = document.getElementById("currentLocationSelect");
+    const value = select.value || "";
 
-      localStorage.setItem("participant_current_location", value);
-      renderCurrentLocation();
+    if (!value) {
+      alert("現在地を選択してください。");
+      return;
     }
 
-    function renderCurrentLocation() {
-      const currentLocation = localStorage.getItem("participant_current_location") || "未設定";
-      document.getElementById("currentLocationText").textContent = currentLocation;
-
-      const select = document.getElementById("currentLocationSelect");
-      if (currentLocation !== "未設定") {
-        select.value = currentLocation;
-      }
-    }
-
-    document.getElementById("saveLocationButton").addEventListener("click", saveCurrentLocation);
-
+    localStorage.setItem("participant_current_location", value);
     renderCurrentLocation();
+  }
 
-  </script>
+  function renderCurrentLocation() {
+    const currentLocation = localStorage.getItem("participant_current_location") || "未設定";
+    document.getElementById("currentLocationText").textContent = currentLocation;
+
+    const select = document.getElementById("currentLocationSelect");
+    if (currentLocation !== "未設定") {
+      select.value = currentLocation;
+    }
+  }
+
+  document.getElementById("userName").textContent = safeGet("participant_name");
+  document.getElementById("userGroup").textContent = safeGet("participant_group");
+  document.getElementById("userRoom").textContent = safeGet("participant_room");
+  document.getElementById("userBaggage").textContent = safeGet("participant_baggage");
+
+  document.getElementById("saveLocationButton").addEventListener("click", saveCurrentLocation);
+
+  const applyTestTimeButton = document.getElementById("applyTestTimeButton");
+  if (applyTestTimeButton) {
+    applyTestTimeButton.addEventListener("click", applyTestTime);
+  }
+
+  const resetTestTimeButton = document.getElementById("resetTestTimeButton");
+  if (resetTestTimeButton) {
+    resetTestTimeButton.addEventListener("click", resetTestTime);
+  }
+
+  renderCurrentLocation();
+  renderTodayProgram();
+</script>
   </body>
 </html>
