@@ -273,7 +273,58 @@
         border-radius: 6px;
         margin-right: 6px;
         vertical-align: middle;
-      }   
+      }
+
+      .announcement-item {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .announcement-item.important {
+        background: #fdecea;
+        border: 2px solid #e53935;
+      }
+
+      .announcement-title {
+        font-weight: bold;
+        margin-bottom: 6px;
+      }
+
+      .announcement-item.important .announcement-title {
+        color: #b71c1c;
+      }
+
+      .announcement-item.important .announcement-body {
+        color: #7f1d1d;
+      }
+
+      .announcement-badge {
+        display: inline-block;
+        background: #e53935;
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 6px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+
+      .announcement-body p {
+        margin: 0 0 8px 0;
+        line-height: 1.7;
+      }
+
+      .announcement-body ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .announcement-body li {
+        margin: 6px 0;
+        line-height: 1.7;
+      }
       
     </style>
   </head>
@@ -303,13 +354,7 @@
       <!-- 👇ここに追加（ベスト） -->
       <div class="card">
         <h2>お知らせ</h2>
-        <div id="announcementBox" class="info-box">
-          <div id="announcementTitle" style="font-weight:bold; margin-bottom:6px;">
-            <span id="announcementBadge"></span>
-            <span id="announcementTitleText"></span>
-          </div>
-          <div id="announcementBody"></div>
-        </div>
+          <div id="announcementList" class="menu"></div>
       </div>
        
       <div class="card">
@@ -702,62 +747,78 @@ listEl.innerHTML = todayData.items.map((item, index) => {
     }
   }
 
-  async function loadAnnouncementForParticipant() {
+async function loadAnnouncementForParticipant() {
   try {
     const res = await jsonpRequest({
       api: "getAnnouncement"
     });
 
-    const titleEl = document.getElementById("announcementTitle");
-    const bodyEl = document.getElementById("announcementBody");
-    const boxEl = document.getElementById("announcementBox");
-    const badgeEl = document.getElementById("announcementBadge");
-    const titleTextEl = document.getElementById("announcementTitleText");
+    const listEl = document.getElementById("announcementList");
 
-    boxEl.classList.remove("announcement-emergency");
-
-    if (res.status !== "ok" || !res.visible) {
-      titleTextEl.textContent = "";
-      bodyEl.textContent = "現在お知らせはありません。";
-      badgeEl.style.display = "none";
+    if (res.status !== "ok" || !Array.isArray(res.items) || res.items.length === 0) {
+      listEl.innerHTML = `
+        <div class="announcement-item">
+          <div class="announcement-body">
+            <p>現在お知らせはありません。</p>
+          </div>
+        </div>
+      `;
       return;
     }
 
-    // 🔑 更新検知用ハッシュ
-    const currentHash = (res.type || "") + "|" + (res.title || "") + "|" + (res.body || "");
+    const currentHash = JSON.stringify(
+      res.items.map(item => ({
+        type: item.type,
+        title: item.title,
+        body: item.body
+      }))
+    );
 
-    // 🔑 初回 or 更新時だけ強調
     const isUpdated = lastAnnouncementHash && lastAnnouncementHash !== currentHash;
 
-    titleTextEl.textContent = res.title || "";
-    bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
+    listEl.innerHTML = res.items.map(item => {
+      const isImportant = item.type === "重要";
+      const badgeHtml = isImportant
+        ? `<span class="announcement-badge">重要</span>`
+        : "";
 
-    if (res.type === "重要") {
-      badgeEl.textContent = "重要";
-      badgeEl.style.display = "inline-block";
-      boxEl.classList.add("announcement-emergency");
-    } else {
-      badgeEl.style.display = "none";
-    }
+      return `
+        <div class="announcement-item${isImportant ? " important" : ""}">
+          <div class="announcement-title">
+            ${badgeHtml}${escapeHtml(item.title || "")}
+          </div>
+          <div class="announcement-body">
+            ${formatAnnouncementBody(item.body || "")}
+          </div>
+        </div>
+      `;
+    }).join("");
 
-    // 🔥 更新時の強調演出
     if (isUpdated) {
-      boxEl.style.transition = "background 0.3s";
-      boxEl.style.background = "#fff3cd"; // 一瞬黄色に
+      const firstItem = listEl.querySelector(".announcement-item");
+      if (firstItem) {
+        firstItem.style.transition = "background 0.3s";
+        firstItem.style.background = "#fff3cd";
 
-      setTimeout(() => {
-        boxEl.style.background = "";
-      }, 1500);
+        setTimeout(() => {
+          firstItem.style.background = "";
+        }, 1500);
 
-      // 軽くスクロールして気づかせる
-      boxEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstItem.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
 
-    // 🔑 最新状態を保存
     lastAnnouncementHash = currentHash;
 
   } catch (e) {
-    document.getElementById("announcementBody").textContent = "お知らせの取得に失敗しました。";
+    const listEl = document.getElementById("announcementList");
+    listEl.innerHTML = `
+      <div class="announcement-item">
+        <div class="announcement-body">
+          <p>お知らせの取得に失敗しました。</p>
+        </div>
+      </div>
+    `;
   }
 }
 
