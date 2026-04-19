@@ -711,7 +711,7 @@ listEl.innerHTML = todayData.items.map((item, index) => {
      bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
 
      if (res.type === "重要") {
-      badgeEl.textContent = "[ 重要お知らせ ]";
+      badgeEl.textContent = "重要";
       badgeEl.style.display = "inline-block";
       boxEl.classList.add("announcement-emergency");
     } else {
