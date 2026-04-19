@@ -153,123 +153,127 @@
         background: #1e8e4d;
       }
 
-.program-item {
-  padding: 10px 12px;
-  border-radius: 10px;
-  margin: 8px 0;
-  background: #f8fafc;
-  border: 1px solid var(--border);
-}
+      .program-item {
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin: 8px 0;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+      }
 
-.program-item.current {
-  background: #e8f5e9;      /* 薄緑 */
-  border: 2px solid #43a047;
-}
+      .program-item.current {
+        background: #e8f5e9;      /* 薄緑 */
+        border: 2px solid #43a047;
+      }
 
-.program-item.current .program-time {
-  color: #2e7d32;
-}
+      .program-item.current .program-time {
+        color: #2e7d32;
+      }
 
-.program-item.next {
-  background: #fff8dc;      /* 薄黄色 */
-  border: 2px solid #f4b400;
-}
+      .program-item.next {
+        background: #fff8dc;      /* 薄黄色 */
+        border: 2px solid #f4b400;
+      }
 
-.program-item.next .program-time {
-  color: #a66b00;
-}
+      .program-item.next .program-time {
+        color: #a66b00;
+      }
 
-.program-time {
-  font-weight: bold;
-  color: var(--primary);
-}
+      .program-time {
+        font-weight: bold;
+        color: var(--primary);
+      }
 
-.program-place {
-  color: var(--sub);
-  font-size: 13px;
-  margin-top: 2px;
-}
+      .program-place {
+        color: var(--sub);
+        font-size: 13px;
+        margin-top: 2px;
+      }
 
-.test-box {
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: #fff;
-}
+      .test-box {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+      }
 
-.test-row {
-  margin: 8px 0;
-}
+      .test-row {
+        margin: 8px 0;
+      }
 
-.test-date-input,
-.test-time-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #fff;
-}
+      .test-date-input,
+      .test-time-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+      }
 
-.test-button-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
-}
+      .test-button-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
 
-.test-button {
-  border: none;
-  cursor: pointer;
-  background: #6b7280;
-}
+      .test-button {
+        border: none;
+        cursor: pointer;
+        background: #6b7280;
+      }
 
-.test-button:hover {
-  background: #4b5563;
-}
+      .test-button:hover {
+        background: #4b5563;
+      }
 
-#announcementBody p {
-  margin: 0 0 8px 0;
-  line-height: 1.7;
-}
+      #announcementBody p {
+        margin: 0 0 8px 0;
+        line-height: 1.7;
+      }
 
-#announcementBody ul {
-  margin: 0;
-  padding-left: 20px;
-}
+      #announcementBody ul {
+        margin: 0;
+        padding-left: 20px;
+      }
 
-#announcementBody li {
-  margin: 6px 0;
-  line-height: 1.7;
-}
+      #announcementBody li {
+        margin: 6px 0;
+        line-height: 1.7;
+      }
 
-.announcement-emergency {
-  background: #fdecea;
-  border: 2px solid #e53935;
-  padding: 16px;
-}
+      .announcement-emergency {
+        background: #fdecea;
+        border: 2px solid #e53935;
+        padding: 16px;
 
-.announcement-emergency #announcementTitle {
-  color: #b71c1c;
-  font-size: 18px;
-}
+        position: sticky;
+        top: 8px;
+        z-index: 20;
+      }
 
-.announcement-emergency #announcementBody {
-  color: #7f1d1d;
-  margin-top: 8px;
-}
+      .announcement-emergency #announcementTitle {
+        color: #b71c1c;
+        font-size: 18px;
+      }
 
-#announcementBadge {
-  display: none;
-  background: #e53935;
-  color: #fff;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 6px;
-  margin-right: 6px;
-  vertical-align: middle;
-}   
+      .announcement-emergency #announcementBody {
+        color: #7f1d1d;
+        margin-top: 8px;
+      }
+
+      #announcementBadge {
+        display: none;
+        background: #e53935;
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 6px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }   
       
     </style>
   </head>
