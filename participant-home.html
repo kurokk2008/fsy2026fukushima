@@ -800,7 +800,9 @@ listEl.innerHTML = todayData.items.map((item, index) => {
   renderCurrentLocation();
   setupProgramTestUi();
   renderTodayProgram();
-  loadAnnouncementForParticipant();  // お知らせ初期化
+  loadAnnouncementForParticipant();  // 初回表示
+
+  setInterval(loadAnnouncementForParticipant, 30000); // ←追加（30秒ごと更新）
   
 </script>
   </body>
