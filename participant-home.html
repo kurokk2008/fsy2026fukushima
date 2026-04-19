@@ -412,6 +412,7 @@
      ========================= */
   const ENABLE_PROGRAM_TEST_UI = true;
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzrzgSuJztmCptH3doFFqSBnGonoGSYqoP-DDuVpqQLDO29W_xXi7JGcCNwaFHXMqu2rw/exec";  //fsy2026福島 PWA Ver27
+  let lastAnnouncementHash = "";
 
   function safeGet(key) {
     return localStorage.getItem(key) || "未設定";
@@ -825,7 +826,7 @@ listEl.innerHTML = todayData.items.map((item, index) => {
   renderTodayProgram();
   loadAnnouncementForParticipant();  // 初回表示
 
-  setInterval(loadAnnouncementForParticipant, 60000); // ←追加（30秒ごと更新）
+  setInterval(loadAnnouncementForParticipant, 60000); // ←追加（60秒ごと更新）
   
 </script>
   </body>
