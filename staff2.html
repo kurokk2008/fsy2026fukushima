@@ -312,6 +312,23 @@
       </div>
 
       <div class="card">
+        <h2>お知らせ一覧</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>種別</th>
+              <th>表示開始</th>
+              <th>表示終了</th>
+              <th>タイトル</th>
+              <th>表示状態</th>
+            </tr>
+          </thead>
+          <tbody id="announcementListBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
         <h2 class="section-title">未チェックイン者一覧</h2>
         <div class="row">
           <div>
@@ -369,7 +386,7 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbzEejA1KUDAqNhqvFuSDABJYnCat3QU0Mo4kK-7kjEg-GPn8S82IfLX87euv12cU1apOw/exec";                // fsy2026福島 PWA Ver28
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbz3J4sK4cNc1cS78abUZHL3p_-7TmK0rFdEX77Zu3KwfTV5CUbYcTW_WtmNi--86pYc/exec";                // fsy2026福島 PWA Ver29
 
       const loadButton = document.getElementById("loadButton");
       const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
@@ -457,6 +474,7 @@
         await loadUncheckedList();
         await loadCheckedInList();
         await loadAnnouncement();
+        await loadAnnouncementList();
       }
 
       async function loadSummary() {
@@ -648,6 +666,50 @@
         }
       }
 
+      async function loadAnnouncementList() {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "announcementList",
+            staffKey
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "お知らせ一覧の取得に失敗しました。", "error");
+            return;
+          }
+
+          renderAnnouncementList(res.items || []);
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+      function renderAnnouncementList(items) {
+        const tbody = document.getElementById("announcementListBody");
+
+        if (!items.length) {
+          tbody.innerHTML = `<tr><td colspan="6">お知らせはありません。</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = items.map(item => `
+          <tr>
+            <td>${escapeHtml(item.rowNumber || "")}</td>
+            <td>${escapeHtml(item.type || "")}</td>
+            <td>${escapeHtml(item.start || "")}</td>
+            <td>${escapeHtml(item.end || "")}</td>
+            <td>${escapeHtml(item.title || "")}</td>
+            <td>${escapeHtml(item.visible || "")}</td>
+          </tr>
+        `).join("");
+      }
+      
       async function saveAnnouncement() {
         const staffKey = getStaffKey();
         if (!staffKey) {
