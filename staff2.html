@@ -740,6 +740,7 @@
           document.getElementById("announcementStatusText").textContent =
             visible === "表示" ? "参加者ホームに表示中" : "参加者ホームでは非表示";
 
+          await loadAnnouncementList();
           showMessage(res.message || "お知らせを保存しました。", "ok");
         } catch (error) {
           showMessage(error.message || "通信エラーが発生しました。", "error");
@@ -754,6 +755,7 @@
           loadSummary();
           loadUncheckedList();
           loadCheckedInList();
+          loadAnnouncementList();
         }
     }, 30000);
       
