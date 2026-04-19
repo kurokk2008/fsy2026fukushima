@@ -276,6 +276,14 @@
         <h2>お知らせ管理</h2>
 
         <div class="form-row">
+          <label for="announcementType"><strong>種別</strong></label>
+          <select id="announcementType" class="text-input">
+            <option value="通常">通常</option>
+            <option value="重要お知らせ">重要お知らせ</option>
+          </select>
+        </div>
+        
+        <div class="form-row">
           <label for="announcementTitle"><strong>タイトル</strong></label>
           <input id="announcementTitle" type="text" class="text-input" placeholder="例：本日のお知らせ">
         </div>
@@ -629,6 +637,7 @@
             return;
           }
 
+          document.getElementById("announcementType").value = res.type || "通常";
           document.getElementById("announcementTitle").value = res.title || "";
           document.getElementById("announcementBody").value = res.body || "";
           document.getElementById("announcementVisible").value = res.rawVisible || "表示";
@@ -646,6 +655,7 @@
           return;
         }
 
+        const type = document.getElementById("announcementType").value || "通常";
         const title = document.getElementById("announcementTitle").value || "";
         const body = document.getElementById("announcementBody").value || "";
         const visible = document.getElementById("announcementVisible").value || "表示";
@@ -654,6 +664,7 @@
           const res = await jsonpRequest({
             api: "saveAnnouncement",
             staffKey,
+            type,
             title,
             body,
             visible
