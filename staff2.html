@@ -706,8 +706,49 @@
             <td>${escapeHtml(item.end || "")}</td>
             <td>${escapeHtml(item.title || "")}</td>
             <td>${escapeHtml(item.visible || "")}</td>
+            <td>
+              <button class="small" type="button"
+                onclick="editAnnouncement(${item.rowNumber})">
+                編集
+              </button>
+            </td>
           </tr>
         `).join("");
+      }
+
+      async function editAnnouncement(rowNumber) {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "announcementGetByRow",
+            staffKey,
+            rowNumber
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "読み込み失敗", "error");
+            return;
+          }
+
+          // フォームに反映
+          document.getElementById("announcementType").value = res.type || "通常";
+          document.getElementById("announcementTitle").value = res.title || "";
+          document.getElementById("announcementBody").value = res.body || "";
+          document.getElementById("announcementVisible").value = res.visible || "表示";
+
+          // 編集中行を保持（重要）
+          window.currentEditRow = rowNumber;
+
+          showMessage(`行 ${rowNumber} を編集中`, "ok");
+
+        } catch (e) {
+          showMessage(e.message, "error");
+        }
       }
       
       async function saveAnnouncement() {
@@ -726,6 +767,7 @@
           const res = await jsonpRequest({
             api: "saveAnnouncement",
             staffKey,
+            rowNumber: window.currentEditRow || "",
             type,
             title,
             body,
