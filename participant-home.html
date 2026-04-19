@@ -702,40 +702,63 @@ listEl.innerHTML = todayData.items.map((item, index) => {
   }
 
   async function loadAnnouncementForParticipant() {
-   try {
-     const res = await jsonpRequest({
-       api: "getAnnouncement"
-     });
+  try {
+    const res = await jsonpRequest({
+      api: "getAnnouncement"
+    });
 
-     const titleEl = document.getElementById("announcementTitle");
-     const bodyEl = document.getElementById("announcementBody");
-     const boxEl = document.getElementById("announcementBox");
-     const badgeEl = document.getElementById("announcementBadge");
-     const titleTextEl = document.getElementById("announcementTitleText");
+    const titleEl = document.getElementById("announcementTitle");
+    const bodyEl = document.getElementById("announcementBody");
+    const boxEl = document.getElementById("announcementBox");
+    const badgeEl = document.getElementById("announcementBadge");
+    const titleTextEl = document.getElementById("announcementTitleText");
 
-     boxEl.classList.remove("announcement-emergency");
+    boxEl.classList.remove("announcement-emergency");
 
-     if (res.status !== "ok" || !res.visible) {
+    if (res.status !== "ok" || !res.visible) {
       titleTextEl.textContent = "";
       bodyEl.textContent = "現在お知らせはありません。";
       badgeEl.style.display = "none";
       return;
-     }
+    }
 
-     titleTextEl.textContent = res.title || "";
-     bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
+    // 🔑 更新検知用ハッシュ
+    const currentHash = (res.type || "") + "|" + (res.title || "") + "|" + (res.body || "");
 
-     if (res.type === "重要") {
+    // 🔑 初回 or 更新時だけ強調
+    const isUpdated = lastAnnouncementHash && lastAnnouncementHash !== currentHash;
+
+    titleTextEl.textContent = res.title || "";
+    bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
+
+    if (res.type === "重要") {
       badgeEl.textContent = "重要";
       badgeEl.style.display = "inline-block";
       boxEl.classList.add("announcement-emergency");
     } else {
       badgeEl.style.display = "none";
     }
-   } catch (e) {
-     document.getElementById("announcementBody").textContent = "お知らせの取得に失敗しました。";
-   }
- }
+
+    // 🔥 更新時の強調演出
+    if (isUpdated) {
+      boxEl.style.transition = "background 0.3s";
+      boxEl.style.background = "#fff3cd"; // 一瞬黄色に
+
+      setTimeout(() => {
+        boxEl.style.background = "";
+      }, 1500);
+
+      // 軽くスクロールして気づかせる
+      boxEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    // 🔑 最新状態を保存
+    lastAnnouncementHash = currentHash;
+
+  } catch (e) {
+    document.getElementById("announcementBody").textContent = "お知らせの取得に失敗しました。";
+  }
+}
 
   function jsonpRequest(params) {
   return new Promise((resolve, reject) => {
@@ -802,7 +825,7 @@ listEl.innerHTML = todayData.items.map((item, index) => {
   renderTodayProgram();
   loadAnnouncementForParticipant();  // 初回表示
 
-  setInterval(loadAnnouncementForParticipant, 30000); // ←追加（30秒ごと更新）
+  setInterval(loadAnnouncementForParticipant, 60000); // ←追加（30秒ごと更新）
   
 </script>
   </body>
