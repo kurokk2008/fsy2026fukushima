@@ -247,14 +247,17 @@
 .announcement-emergency {
   background: #fdecea;
   border: 2px solid #e53935;
+  padding: 16px;
 }
 
 .announcement-emergency #announcementTitle {
   color: #b71c1c;
+  font-size: 18px;
 }
 
 .announcement-emergency #announcementBody {
   color: #7f1d1d;
+  margin-top: 8px;
 }
       
     </style>
@@ -285,14 +288,17 @@
       <!-- 👇ここに追加（ベスト） -->
       <div class="card">
         <h2>お知らせ</h2>
-          <div id="announcementBox" class="info-box">
-            <div id="announcementTitle" style="font-weight:bold; margin-bottom:6px;"></div>
-            <div id="announcementBody"></div>
+        <div id="announcementBox" class="info-box">
+          <div id="announcementTitle" style="font-weight:bold; margin-bottom:6px;">
+            <span id="announcementBadge"></span>
+            <span id="announcementTitleText"></span>
           </div>
+          <div id="announcementBody"></div>
+        </div>
       </div>
-     
+       
       <div class="card">
-        <h2>地図と案内</h2>
+        <h2>那須甲子青少年自然の家　施設案内</h2>
 
         <div class="info-box">
           <div class="info-row">
@@ -689,21 +695,28 @@ listEl.innerHTML = todayData.items.map((item, index) => {
      const titleEl = document.getElementById("announcementTitle");
      const bodyEl = document.getElementById("announcementBody");
      const boxEl = document.getElementById("announcementBox");
+     const badgeEl = document.getElementById("announcementBadge");
+     const titleTextEl = document.getElementById("announcementTitleText");
 
      boxEl.classList.remove("announcement-emergency");
 
      if (res.status !== "ok" || !res.visible) {
-       titleEl.textContent = "";
-       bodyEl.textContent = "現在お知らせはありません。";
-       return;
+      titleTextEl.textContent = "";
+      bodyEl.textContent = "現在お知らせはありません。";
+      badgeEl.style.display = "none";
+      return;
      }
 
-     titleEl.textContent = res.title || "";
+     titleTextEl.textContent = res.title || "";
      bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
 
      if (res.type === "緊急") {
-       boxEl.classList.add("announcement-emergency");
-     }
+      badgeEl.textContent = "緊急";
+      badgeEl.style.display = "inline-block";
+      boxEl.classList.add("announcement-emergency");
+    } else {
+      badgeEl.style.display = "none";
+    }
    } catch (e) {
      document.getElementById("announcementBody").textContent = "お知らせの取得に失敗しました。";
    }
