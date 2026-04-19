@@ -710,7 +710,7 @@ listEl.innerHTML = todayData.items.map((item, index) => {
      titleTextEl.textContent = res.title || "";
      bodyEl.innerHTML = formatAnnouncementBody(res.body || "");
 
-     if (res.type === "緊急") {
+     if (res.type === "重要") {
       badgeEl.textContent = "[ 重要お知らせ ]";
       badgeEl.style.display = "inline-block";
       boxEl.classList.add("announcement-emergency");
