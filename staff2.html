@@ -310,7 +310,6 @@
         </div>
 
         <div class="button-row">
-          <button id="loadAnnouncementButton" type="button" class="action-button">現在内容を読み込み</button>
           <button id="saveAnnouncementButton" type="button" class="action-button primary-button">お知らせを保存</button>
         </div>
       </div>
@@ -479,7 +478,6 @@
         await loadSummary();
         await loadUncheckedList();
         await loadCheckedInList();
-        await loadAnnouncement();
         await loadAnnouncementList();
       }
 
@@ -643,35 +641,6 @@
         }
       }
 
-      async function loadAnnouncement() {
-        const staffKey = getStaffKey();
-        if (!staffKey) {
-          showMessage("スタッフキーを入力してください。", "error");
-          return;
-        }
-
-        try {
-          const res = await jsonpRequest({
-            api: "getAnnouncement",
-            staffKey
-          });
-
-          if (res.status !== "ok") {
-            showMessage(res.message || "お知らせの取得に失敗しました。", "error");
-            return;
-          }
-
-          document.getElementById("announcementType").value = res.type || "通常";
-          document.getElementById("announcementTitle").value = res.title || "";
-          document.getElementById("announcementBody").value = res.body || "";
-          document.getElementById("announcementVisible").value = res.rawVisible || "表示";
-          document.getElementById("announcementStatusText").textContent =
-            res.visible ? "参加者ホームに表示中" : "参加者ホームでは非表示";
-        } catch (error) {
-          showMessage(error.message || "通信エラーが発生しました。", "error");
-        }
-      }
-
       async function loadAnnouncementList() {
         const staffKey = getStaffKey();
         if (!staffKey) {
@@ -718,41 +687,6 @@
             </td>
           </tr>
         `).join("");
-      }
-
-      async function editAnnouncement(rowNumber) {
-        const staffKey = getStaffKey();
-        if (!staffKey) {
-          showMessage("スタッフキーを入力してください。", "error");
-          return;
-        }
-
-        try {
-          const res = await jsonpRequest({
-            api: "announcementGetByRow",
-            staffKey,
-            rowNumber
-          });
-
-          if (res.status !== "ok") {
-            showMessage(res.message || "読み込み失敗", "error");
-            return;
-          }
-
-          // フォームに反映
-          document.getElementById("announcementType").value = res.type || "通常";
-          document.getElementById("announcementTitle").value = res.title || "";
-          document.getElementById("announcementBody").value = res.body || "";
-          document.getElementById("announcementVisible").value = res.visible || "表示";
-
-          // 編集中行を保持（重要）
-          window.currentEditRow = rowNumber;
-
-          showMessage(`行 ${rowNumber} を編集中`, "ok");
-
-        } catch (e) {
-          showMessage(e.message, "error");
-        }
       }
 
       function resetAnnouncementForm() {
@@ -854,9 +788,6 @@
             return;
           }
 
-          document.getElementById("announcementStatusText").textContent =
-            visible === "表示" ? "参加者ホームに表示中" : "参加者ホームでは非表示";
-
           await loadAnnouncementList();
             resetAnnouncementForm();
             showMessage(res.message || "お知らせを保存しました。", "ok");
@@ -865,7 +796,6 @@
         }
       }
 
-    document.getElementById("loadAnnouncementButton").addEventListener("click", loadAnnouncement);
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
       
