@@ -325,6 +325,20 @@
         margin: 6px 0;
         line-height: 1.7;
       }
+
+      .form-row {
+        margin-bottom: 12px;
+      }
+
+      .text-input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        box-sizing: border-box;
+      }
       
     </style>
   </head>
@@ -356,7 +370,38 @@
         <h2>お知らせ</h2>
           <div id="announcementList" class="menu"></div>
       </div>
-       
+
+      <div class="card">
+        <h2>Tシャツサイズ申告</h2>
+        <div class="info-box">
+          <div class="form-row">
+            <label for="tshirtSizeSelect"><strong>サイズを選択してください</strong></label>
+            <select id="tshirtSizeSelect" class="text-input">
+              <option value="">選択してください</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="LL">LL</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+
+          <div id="tshirtOtherRow" class="form-row" style="display:none;">
+            <label for="tshirtOtherInput"><strong>その他のサイズ</strong></label>
+            <input id="tshirtOtherInput" type="text" class="text-input" placeholder="例: 3L">
+          </div>
+
+          <div class="button-row">
+            <button id="saveTshirtSizeButton" type="button" class="menu-link program">Tシャツサイズを保存</button>
+          </div>
+
+          <div class="info-row" style="margin-top:12px;">
+            <strong>現在の申告：</strong><span id="tshirtSizeCurrent">未申告</span>
+          </div>
+        </div>
+      </div>
+
+      
       <div class="card">
         <h2>那須甲子青少年自然の家　施設案内</h2>
 
@@ -875,17 +920,71 @@ async function loadAnnouncementForParticipant() {
     return lines.map(line => `<p>${escapeHtml(line)}</p>`).join("");
   }  
 
+  function toggleTshirtOtherInput() {
+  const size = document.getElementById("tshirtSizeSelect").value;
+  const otherRow = document.getElementById("tshirtOtherRow");
+
+  otherRow.style.display = size === "その他" ? "" : "none";
+　}
+
+  async function saveTshirtSize() {
+  const name = localStorage.getItem("participant_name") || "";
+  const birth = localStorage.getItem("participant_birth") || "";
+  const size = document.getElementById("tshirtSizeSelect").value || "";
+  const otherSize = document.getElementById("tshirtOtherInput").value || "";
+
+  if (!size) {
+    alert("Tシャツサイズを選択してください。");
+    return;
+  }
+
+  if (size === "その他" && !otherSize.trim()) {
+    alert("その他のサイズを入力してください。");
+    return;
+  }
+
+  try {
+    const res = await jsonpRequest({
+      api: "saveTshirtSize",
+      name,
+      birth,
+      size,
+      otherSize
+    });
+
+    if (res.status !== "ok") {
+      alert(res.message || "保存に失敗しました。");
+      return;
+    }
+
+    const savedSize = res.size || (size === "その他" ? otherSize : size);
+    localStorage.setItem("participant_tshirt_size", savedSize);
+    document.getElementById("tshirtSizeCurrent").textContent = savedSize;
+
+    alert(res.message || "Tシャツサイズを保存しました。");
+  } catch (e) {
+    alert("通信エラーが発生しました。");
+  }
+}
+
+  function renderTshirtSize() {
+  const saved = localStorage.getItem("participant_tshirt_size") || "未申告";
+  document.getElementById("tshirtSizeCurrent").textContent = saved;
+}
+
   document.getElementById("userName").textContent = safeGet("participant_name");
   document.getElementById("userGroup").textContent = safeGet("participant_group");
   document.getElementById("userRoom").textContent = safeGet("participant_room");
   document.getElementById("userBaggage").textContent = safeGet("participant_baggage");
-
   document.getElementById("saveLocationButton").addEventListener("click", saveCurrentLocation);
+  document.getElementById("tshirtSizeSelect").addEventListener("change", toggleTshirtOtherInput);
+　document.getElementById("saveTshirtSizeButton").addEventListener("click", saveTshirtSize);
 
   renderCurrentLocation();
   setupProgramTestUi();
   renderTodayProgram();
   loadAnnouncementForParticipant();  // 初回表示
+  renderTshirtSize();
 
   setInterval(loadAnnouncementForParticipant, 60000); // ←追加（60秒ごと更新）
   
