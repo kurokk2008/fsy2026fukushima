@@ -238,7 +238,7 @@
       
     </style>
   </head>
-  <body>
+  <body>  
     <div class="container">
       <div class="card">
         <h1>fsy2026福島 スタッフ画面</h1>
@@ -255,23 +255,91 @@
       </div>
 
       <div class="card">
-        <h2>受付状況</h2>
-        <div class="summary">
-          <div class="summary-box">
-            <div class="label">総人数</div>
-            <div class="value" id="totalCount">-</div>
-          </div>
-          <div class="summary-box">
-            <div class="label">受付済み</div>
-            <div class="value" id="checkedInCount">-</div>
-          </div>
-          <div class="summary-box">
-            <div class="label">未受付</div>
-            <div class="value" id="uncheckedCount">-</div>
-          </div>
+        <div class="button-row">
+          <button id="showCheckinMenuButton" type="button" class="action-button primary-button">チェックイン管理</button>
+          <button id="showAnnouncementMenuButton" type="button" class="action-button">お知らせ管理</button>
         </div>
       </div>
 
+      <div id="checkinSection">
+        <div class="card">
+          <h2>受付状況</h2>
+          <div class="summary">
+            <div class="summary-box">
+              <div class="label">総人数</div>
+              <div class="value" id="totalCount">-</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">受付済み</div>
+              <div class="value" id="checkedInCount">-</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">未受付</div>
+              <div class="value" id="uncheckedCount">-</div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card">
+          <h2 class="section-title">未チェックイン者一覧</h2>
+          <div class="row">
+            <div>
+              <label for="uncheckedKeyword">名前検索</label>
+              <input id="uncheckedKeyword" placeholder="名前の一部を入力">
+            </div>
+            <div>
+              <button id="uncheckedSearchButton" type="button">検索</button>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>所属ステーク・地方部</th>
+                <th>役割</th>
+                <th>グループ</th>
+                <th>宿泊部屋</th>
+                <th>入所時荷物置き場</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="uncheckedListBody"></tbody>
+          </table>
+        </div>
+        
+        <div class="card">
+          <h2 class="section-title">受付済み一覧</h2>
+          <div class="row">
+            <div>
+              <label for="checkedKeyword">名前検索</label>
+              <input id="checkedKeyword" placeholder="名前の一部を入力">
+            </div>
+            <div>
+              <button id="checkedSearchButton" type="button">検索</button>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>所属ステーク・地方部</th>
+                <th>役割</th>
+                <th>グループ</th>
+                <th>宿泊部屋</th>
+                <th>入所時荷物置き場</th>
+                <th>受付時刻</th>
+              </tr>
+            </thead>
+            <tbody id="checkedListBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+
+    <div id="announcementSection" style="display:none;">
       <div class="card">
         <h2>お知らせ管理</h2>
 
@@ -331,64 +399,8 @@
           <tbody id="announcementListBody"></tbody>
         </table>
       </div>
-
-      <div class="card">
-        <h2 class="section-title">未チェックイン者一覧</h2>
-        <div class="row">
-          <div>
-            <label for="uncheckedKeyword">名前検索</label>
-            <input id="uncheckedKeyword" placeholder="名前の一部を入力">
-          </div>
-          <div>
-            <button id="uncheckedSearchButton" type="button">検索</button>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>名前</th>
-              <th>所属ステーク・地方部</th>
-              <th>役割</th>
-              <th>グループ</th>
-              <th>宿泊部屋</th>
-              <th>入所時荷物置き場</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="uncheckedListBody"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">受付済み一覧</h2>
-        <div class="row">
-          <div>
-            <label for="checkedKeyword">名前検索</label>
-            <input id="checkedKeyword" placeholder="名前の一部を入力">
-          </div>
-          <div>
-            <button id="checkedSearchButton" type="button">検索</button>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>名前</th>
-              <th>所属ステーク・地方部</th>
-              <th>役割</th>
-              <th>グループ</th>
-              <th>宿泊部屋</th>
-              <th>入所時荷物置き場</th>
-              <th>受付時刻</th>
-            </tr>
-          </thead>
-          <tbody id="checkedListBody"></tbody>
-        </table>
-      </div>
     </div>
-
+      
     <script>
       const GAS_URL = "https://script.google.com/macros/s/AKfycbxDozD82e1wseo6kpWM-AIkXAC8acmYfk7UTzkMYrz9Nei2SmqokhotX8ng6jLWPLTDyg/exec"; // fsy2026福島 PWA Ver31
       let currentEditRow = null;
@@ -408,6 +420,22 @@
 
       function clearMessage() {
         message.innerHTML = "";
+      }
+
+      function showCheckinSection() {
+        document.getElementById("checkinSection").style.display = "";
+        document.getElementById("announcementSection").style.display = "none";
+
+        document.getElementById("showCheckinMenuButton").classList.add("primary-button");
+        document.getElementById("showAnnouncementMenuButton").classList.remove("primary-button");
+      }
+
+      function showAnnouncementSection() {
+        document.getElementById("checkinSection").style.display = "none";
+        document.getElementById("announcementSection").style.display = "";
+
+        document.getElementById("showCheckinMenuButton").classList.remove("primary-button");
+        document.getElementById("showAnnouncementMenuButton").classList.add("primary-button");
       }
 
       function escapeHtml(value) {
@@ -798,6 +826,8 @@
 
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
+    document.getElementById("showCheckinMenuButton").addEventListener("click", showCheckinSection);
+    document.getElementById("showAnnouncementMenuButton").addEventListener("click", showAnnouncementSection);
       
     setInterval(() => {
         if (getStaffKey()) {
@@ -807,6 +837,8 @@
           loadAnnouncementList();
         }
     }, 30000);
+
+    showCheckinSection();
       
     </script>
   </body>
