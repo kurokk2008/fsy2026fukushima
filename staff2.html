@@ -275,6 +275,14 @@
       <div class="card">
         <h2>お知らせ管理</h2>
 
+        <div class="info-box" style="margin-bottom: 12px;">
+          <div><strong>編集中の行：</strong><span id="editingAnnouncementRow">新規作成</span></div>
+        </div>
+
+        <div class="button-row" style="margin-bottom: 12px;">
+          <button id="newAnnouncementButton" type="button" class="action-button">新規作成</button>
+        </div>
+        
         <div class="form-row">
           <label for="announcementType"><strong>種別</strong></label>
           <select id="announcementType" class="text-input">
@@ -322,6 +330,7 @@
               <th>表示終了</th>
               <th>タイトル</th>
               <th>表示状態</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody id="announcementListBody"></tbody>
@@ -386,8 +395,9 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbzvbboz7o0mgLHivXAZqbrwScyTfyE0awJUgVf8KLWWUcc3XZYzE-N0nZhA_o5eGCw-/exec";                // fsy2026福島 PWA Ver30
-
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbzvbboz7o0mgLHivXAZqbrwScyTfyE0awJUgVf8KLWWUcc3XZYzE-N0nZhA_o5eGCw-/exec"; // fsy2026福島 PWA Ver30
+      let currentEditRow = null;
+      
       const loadButton = document.getElementById("loadButton");
       const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
       const checkedSearchButton = document.getElementById("checkedSearchButton");
@@ -694,7 +704,7 @@
         const tbody = document.getElementById("announcementListBody");
 
         if (!items.length) {
-          tbody.innerHTML = `<tr><td colspan="6">お知らせはありません。</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7">お知らせはありません。</td></tr>`;
           return;
         }
 
@@ -707,10 +717,8 @@
             <td>${escapeHtml(item.title || "")}</td>
             <td>${escapeHtml(item.visible || "")}</td>
             <td>
-              <button class="small" type="button"
-                onclick="editAnnouncement(${item.rowNumber})">
-                編集
-              </button>
+              <button class="small" type="button" onclick="editAnnouncement(${item.rowNumber})">編集</button>
+              <button class="small" type="button" onclick="hideAnnouncement(${item.rowNumber})">非表示</button>
             </td>
           </tr>
         `).join("");
@@ -750,6 +758,77 @@
           showMessage(e.message, "error");
         }
       }
+
+      function resetAnnouncementForm() {
+        currentEditRow = null;
+        document.getElementById("editingAnnouncementRow").textContent = "新規作成";
+        document.getElementById("announcementType").value = "通常";
+        document.getElementById("announcementTitle").value = "";
+        document.getElementById("announcementBody").value = "";
+        document.getElementById("announcementVisible").value = "表示";
+      }
+
+      async function editAnnouncement(rowNumber) {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "announcementGetByRow",
+            staffKey,
+            rowNumber
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "お知らせの読み込みに失敗しました。", "error");
+            return;
+          }
+
+          currentEditRow = rowNumber;
+          document.getElementById("editingAnnouncementRow").textContent = rowNumber;
+          document.getElementById("announcementType").value = res.type || "通常";
+          document.getElementById("announcementTitle").value = res.title || "";
+          document.getElementById("announcementBody").value = res.body || "";
+          document.getElementById("announcementVisible").value = res.visible || "表示";
+
+          showMessage(`行 ${rowNumber} を読み込みました。`, "ok");
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+      async function hideAnnouncement(rowNumber) {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        if (!confirm(`行 ${rowNumber} を非表示にしますか？`)) {
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "announcementHide",
+            staffKey,
+            rowNumber
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "非表示に失敗しました。", "error");
+            return;
+          }
+
+          await loadAnnouncementList();
+          showMessage(res.message || "非表示にしました。", "ok");
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
       
       async function saveAnnouncement() {
         const staffKey = getStaffKey();
@@ -767,7 +846,7 @@
           const res = await jsonpRequest({
             api: "saveAnnouncement",
             staffKey,
-            rowNumber: window.currentEditRow || "",
+            rowNumber: currentEditRow || "",
             type,
             title,
             body,
@@ -783,7 +862,8 @@
             visible === "表示" ? "参加者ホームに表示中" : "参加者ホームでは非表示";
 
           await loadAnnouncementList();
-          showMessage(res.message || "お知らせを保存しました。", "ok");
+            resetAnnouncementForm();
+            showMessage(res.message || "お知らせを保存しました。", "ok");
         } catch (error) {
           showMessage(error.message || "通信エラーが発生しました。", "error");
         }
@@ -791,6 +871,7 @@
 
     document.getElementById("loadAnnouncementButton").addEventListener("click", loadAnnouncement);
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
+    document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
       
     setInterval(() => {
         if (getStaffKey()) {
