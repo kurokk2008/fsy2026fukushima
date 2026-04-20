@@ -235,6 +235,19 @@
         border-radius: 12px;
         padding: 14px;
       }
+
+      #announcementSection {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .action-button.primary-button {
+        box-shadow: 0 0 0 2px rgba(47,128,237,0.15);
+      }
+
+      .announcement-row-hidden {
+        opacity: 0.55;
+      }
       
     </style>
   </head>
@@ -701,20 +714,24 @@
           return;
         }
 
-        tbody.innerHTML = items.map(item => `
-          <tr>
-            <td>${escapeHtml(item.rowNumber || "")}</td>
-            <td>${escapeHtml(item.type || "")}</td>
-            <td>${escapeHtml(item.start || "")}</td>
-            <td>${escapeHtml(item.end || "")}</td>
-            <td>${escapeHtml(item.title || "")}</td>
-            <td>${escapeHtml(item.visible || "")}</td>
-            <td>
-              <button class="small" type="button" onclick="editAnnouncement(${item.rowNumber})">編集</button>
-              <button class="small" type="button" onclick="hideAnnouncement(${item.rowNumber})">非表示</button>
-            </td>
-          </tr>
-        `).join("");
+        tbody.innerHTML = items.map(item => {
+          const rowClass = item.visible === "非表示" ? "announcement-row-hidden" : "";
+
+          return `
+            <tr class="${rowClass}">
+              <td>${escapeHtml(item.rowNumber || "")}</td>
+              <td>${escapeHtml(item.type || "")}</td>
+              <td>${escapeHtml(item.start || "")}</td>
+              <td>${escapeHtml(item.end || "")}</td>
+              <td>${escapeHtml(item.title || "")}</td>
+              <td>${escapeHtml(item.visible || "")}</td>
+              <td>
+                <button class="small" type="button" onclick="editAnnouncement(${item.rowNumber})">編集</button>
+                <button class="small" type="button" onclick="hideAnnouncement(${item.rowNumber})">非表示</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
       }
 
       function resetAnnouncementForm() {
