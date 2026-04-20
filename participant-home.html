@@ -933,6 +933,10 @@ async function loadAnnouncementForParticipant() {
   const size = document.getElementById("tshirtSizeSelect").value || "";
   const otherSize = document.getElementById("tshirtOtherInput").value || "";
 
+  //Test用のログ出力  
+　console.log("participant_name=", localStorage.getItem("participant_name"));
+　console.log("participant_birth=", localStorage.getItem("participant_birth"));
+
   if (!size) {
     alert("Tシャツサイズを選択してください。");
     return;
