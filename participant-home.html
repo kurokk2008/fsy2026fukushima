@@ -927,22 +927,33 @@ async function loadAnnouncementForParticipant() {
   otherRow.style.display = size === "その他" ? "" : "none";
 　}
 
-  async function saveTshirtSize() {
-  const name = localStorage.getItem("participant_name") || "";
-  const birth = localStorage.getItem("participant_birth") || "";
+ async function saveTshirtSize() {
+  const name = (localStorage.getItem("participant_name") || "").trim();
+  const rawBirth = (localStorage.getItem("participant_birth") || "").trim();
   const size = document.getElementById("tshirtSizeSelect").value || "";
-  const otherSize = document.getElementById("tshirtOtherInput").value || "";
+  const otherSize = (document.getElementById("tshirtOtherInput").value || "").trim();
 
-  //Test用のログ出力  
-　console.log("participant_name=", localStorage.getItem("participant_name"));
-　console.log("participant_birth=", localStorage.getItem("participant_birth"));
+  // 生年月日を YYYY-MM-DD に寄せる
+  const birth = rawBirth.replace(/\//g, "-");
+
+  // 確認用ログ
+  console.log("participant_name =", name);
+  console.log("participant_birth(raw) =", rawBirth);
+  console.log("participant_birth(normalized) =", birth);
+  console.log("size =", size);
+  console.log("otherSize =", otherSize);
+
+  if (!name || !birth) {
+    alert("名前または生年月日の情報が見つかりません。いったんチェックイン画面に戻って、再度チェックインしてください。");
+    return;
+  }
 
   if (!size) {
     alert("Tシャツサイズを選択してください。");
     return;
   }
 
-  if (size === "その他" && !otherSize.trim()) {
+  if (size === "その他" && !otherSize) {
     alert("その他のサイズを入力してください。");
     return;
   }
@@ -956,21 +967,24 @@ async function loadAnnouncementForParticipant() {
       otherSize
     });
 
-    if (res.status !== "ok") {
-      alert(res.message || "保存に失敗しました。");
+    console.log("saveTshirtSize response =", res);
+
+    if (!res || res.status !== "ok") {
+      alert((res && res.message) || "保存に失敗しました。");
       return;
     }
 
     const savedSize = res.size || (size === "その他" ? otherSize : size);
+
     localStorage.setItem("participant_tshirt_size", savedSize);
     document.getElementById("tshirtSizeCurrent").textContent = savedSize;
 
     alert(res.message || "Tシャツサイズを保存しました。");
   } catch (e) {
+    console.error("saveTshirtSize error =", e);
     alert("通信エラーが発生しました。");
   }
 }
-
   function renderTshirtSize() {
   const saved = localStorage.getItem("participant_tshirt_size") || "未申告";
   document.getElementById("tshirtSizeCurrent").textContent = saved;
