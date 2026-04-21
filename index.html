@@ -458,7 +458,7 @@
           localStorage.setItem("participant_group", res.group || "");
           localStorage.setItem("participant_room", res.room || "");
           localStorage.setItem("participant_baggage", res.baggage || "");
-          localStorage.setItem("participant_birth", birth);
+          localStorage.setItem("participant_birth", document.getElementById("birth").value || "");
 
           result.innerHTML = `
             <div class="panel success-box"><strong>${escapeHtml(res.message || "チェックイン完了しました。")}</strong></div>
@@ -480,7 +480,7 @@
           localStorage.setItem("participant_group", res.group || "");
           localStorage.setItem("participant_room", res.room || "");
           localStorage.setItem("participant_baggage", res.baggage || "");
-          localStorage.setItem("participant_birth", birth);
+          localStorage.setItem("participant_birth", document.getElementById("birth").value || "");
 
           result.innerHTML = `
             <div class="panel duplicate-box"><strong>${escapeHtml(res.message || "すでにチェックイン済みです。")}</strong></div>
