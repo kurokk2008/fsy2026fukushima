@@ -482,6 +482,24 @@
         </div>
       </div>
 
+<div class="card">
+  <h2>シャワー利用申請</h2>
+  <div class="info-box">
+    <div class="info-row">
+      <strong>現在の申請状況：</strong><span id="showerRequestStatusText">確認中...</span>
+    </div>
+
+    <div id="showerRequestDetailBox" class="notice-box" style="display:none;">
+      <div class="info-row"><strong>利用時間：</strong><span id="showerRequestTimeText">未設定</span></div>
+      <div class="info-row"><strong>利用場所：</strong><span id="showerRequestRoomText">未設定</span></div>
+      <div class="info-row"><strong>案内：</strong><span id="showerRequestMemoText">未設定</span></div>
+    </div>
+
+    <div class="button-row" style="margin-top:12px;">
+      <button id="applyShowerRequestButton" type="button" class="menu-link program">シャワー利用を申請する</button>
+    </div>
+  </div>
+</div>
 
 <div class="card">
   <h2>Tシャツサイズ申告</h2>
@@ -1038,6 +1056,92 @@ async function loadAnnouncementForParticipant() {
   document.getElementById("tshirtSizeCurrent").textContent = saved;
 }
 
+async function loadShowerRequestStatus() {
+  const name = (localStorage.getItem("participant_name") || "").trim();
+  const birth = (localStorage.getItem("participant_birth") || "").trim();
+
+  const statusEl = document.getElementById("showerRequestStatusText");
+  const detailBox = document.getElementById("showerRequestDetailBox");
+  const timeEl = document.getElementById("showerRequestTimeText");
+  const roomEl = document.getElementById("showerRequestRoomText");
+  const memoEl = document.getElementById("showerRequestMemoText");
+
+  if (!name || !birth) {
+    statusEl.textContent = "未申請";
+    detailBox.style.display = "none";
+    return;
+  }
+
+  try {
+    const res = await jsonpRequest({
+      api: "getShowerRequestStatus",
+      name,
+      birth
+    });
+
+    if (res.status !== "ok") {
+      statusEl.textContent = "取得失敗";
+      detailBox.style.display = "none";
+      return;
+    }
+
+    statusEl.textContent = res.requestStatus || "未申請";
+
+    if (res.requestStatus === "受理") {
+      detailBox.style.display = "";
+      timeEl.textContent = (res.startTime && res.endTime) ? `${res.startTime}〜${res.endTime}` : "未設定";
+      roomEl.textContent = res.showerRoom || "未設定";
+      memoEl.textContent = res.staffMemo || "スタッフ案内をご確認ください。";
+      return;
+    }
+
+    if (res.requestStatus === "受付") {
+      detailBox.style.display = "";
+      timeEl.textContent = "調整中";
+      roomEl.textContent = "調整中";
+      memoEl.textContent = res.staffMemo || "調整中です。案内をお待ちください。";
+      return;
+    }
+
+    detailBox.style.display = "none";
+  } catch (e) {
+    statusEl.textContent = "取得失敗";
+    detailBox.style.display = "none";
+  }
+}
+
+async function applyShowerRequest() {
+  const name = (localStorage.getItem("participant_name") || "").trim();
+  const birth = (localStorage.getItem("participant_birth") || "").trim();
+  const group = (localStorage.getItem("participant_group") || "").trim();
+  const room = (localStorage.getItem("participant_room") || "").trim();
+
+  if (!name || !birth) {
+    alert("参加者情報が不足しています。チェックイン画面から入り直してください。");
+    return;
+  }
+
+  try {
+    const res = await jsonpRequest({
+      api: "applyShowerRequest",
+      name,
+      birth,
+      group,
+      room
+    });
+
+    if (res.status !== "ok") {
+      alert(res.message || "申請に失敗しました。");
+      return;
+    }
+
+    alert(res.message || "シャワー利用申請を受け付けました。");
+    await loadShowerRequestStatus();
+  } catch (e) {
+    alert("通信エラーが発生しました。");
+  }
+}
+
   document.getElementById("userName").textContent = safeGet("participant_name");
   document.getElementById("userGroup").textContent = safeGet("participant_group");
   document.getElementById("userRoom").textContent = safeGet("participant_room");
@@ -1045,6 +1149,8 @@ async function loadAnnouncementForParticipant() {
   document.getElementById("saveLocationButton").addEventListener("click", saveCurrentLocation);
   document.getElementById("tshirtSizeSelect").addEventListener("change", toggleTshirtOtherInput);
 　document.getElementById("saveTshirtSizeButton").addEventListener("click", saveTshirtSize);
+  document.getElementById("applyShowerRequestButton").addEventListener("click", applyShowerRequest);
+loadShowerRequestStatus();
 
   renderCurrentLocation();
   setupProgramTestUi();
