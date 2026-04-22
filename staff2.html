@@ -839,8 +839,6 @@
         document.getElementById("announcementTitle").value = "";
         document.getElementById("announcementBody").value = "";
         document.getElementById("announcementVisible").value = "表示";
-        document.getElementById("showShowerMenuButton").addEventListener("click", showShowerSection);
-        document.getElementById("saveShowerRequestButton").addEventListener("click", saveShowerRequest);
       }
 
       async function editAnnouncement(rowNumber) {
@@ -1075,6 +1073,8 @@
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
     document.getElementById("showCheckinMenuButton").addEventListener("click", showCheckinSection);
     document.getElementById("showAnnouncementMenuButton").addEventListener("click", showAnnouncementSection);
+    document.getElementById("showShowerMenuButton").addEventListener("click", showShowerSection);
+    document.getElementById("saveShowerRequestButton").addEventListener("click", saveShowerRequest);
       
     setInterval(() => {
         if (getStaffKey()) {
