@@ -260,6 +260,10 @@
       #announcementSection .card {
         width: 100%;
       }
+
+      .menu-three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
       
     </style>
   </head>
@@ -280,9 +284,10 @@
       </div>
 
       <div class="card">
-        <div class="button-row">
+        <div class="button-row menu-three">
           <button id="showCheckinMenuButton" type="button" class="action-button primary-button">チェックイン管理</button>
           <button id="showAnnouncementMenuButton" type="button" class="action-button">お知らせ管理</button>
+          <button id="showShowerMenuButton" type="button" class="action-button">シャワー申請管理</button>
         </div>
       </div>
 
@@ -422,8 +427,74 @@
           </thead>
           <tbody id="announcementListBody"></tbody>
         </table>
-      </div>
+      </div>  
     </div>
+
+    <div id="showerSection" style="display:none;">
+      <div class="card">
+        <h2>シャワー申請管理</h2>
+
+        <div class="info-box" style="margin-bottom: 12px;">
+          <div><strong>編集中の行：</strong><span id="editingShowerRow">未選択</span></div>
+        </div>
+
+        <div class="form-row">
+          <label for="showerRequestStatus"><strong>申請状態</strong></label>
+          <select id="showerRequestStatus" class="text-input">
+            <option value="申請中">申請中</option>
+            <option value="受付">受付</option>
+            <option value="受理">受理</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="showerStartTime"><strong>利用開始時刻</strong></label>
+          <input id="showerStartTime" type="time" class="text-input">
+        </div>
+
+        <div class="form-row">
+          <label for="showerEndTime"><strong>利用終了時刻</strong></label>
+          <input id="showerEndTime" type="time" class="text-input">
+        </div>
+
+        <div class="form-row">
+          <label for="showerRoomInput"><strong>シャワー室</strong></label>
+          <input id="showerRoomInput" type="text" class="text-input" placeholder="例：シャワー室A">
+        </div>
+
+        <div class="form-row">
+          <label for="showerStaffMemo"><strong>スタッフメモ</strong></label>
+          <textarea id="showerStaffMemo" class="text-area" rows="3" placeholder="参加者への案内メモ"></textarea>
+        </div>
+
+        <div class="button-row">
+          <button id="saveShowerRequestButton" type="button" class="action-button primary-button">シャワー申請を保存</button>
+        </div>
+      </div>
+
+  <div class="card">
+    <h2>シャワー申請一覧</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>行</th>
+          <th>申請日時</th>
+          <th>名前</th>
+          <th>グループ</th>
+          <th>宿泊部屋</th>
+          <th>状態</th>
+          <th>開始</th>
+          <th>終了</th>
+          <th>シャワー室</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="showerRequestListBody"></tbody>
+    </table>
+  </div>
+</div>
+
+      
     </div>   
     <script>
       const GAS_URL = "https://script.google.com/macros/s/AKfycbwchO4L71BMm-VkAiQ8UgN_9IgC6e7Gr-e_lTO08kkTq1SQjdqzSFTAMRDw6zZrurBCKg/exec"; // fsy2026福島 PWA Ver41
@@ -433,6 +504,7 @@
       const uncheckedSearchButton = document.getElementById("uncheckedSearchButton");
       const checkedSearchButton = document.getElementById("checkedSearchButton");
       const message = document.getElementById("message");
+      let currentShowerEditRow = null;
 
       loadButton.addEventListener("click", loadStaffScreen);
       uncheckedSearchButton.addEventListener("click", loadUncheckedList);
@@ -449,17 +521,31 @@
       function showCheckinSection() {
         document.getElementById("checkinSection").style.display = "";
         document.getElementById("announcementSection").style.display = "none";
+        document.getElementById("showerSection").style.display = "none";
 
         document.getElementById("showCheckinMenuButton").classList.add("primary-button");
         document.getElementById("showAnnouncementMenuButton").classList.remove("primary-button");
+        document.getElementById("showShowerMenuButton").classList.remove("primary-button");
       }
 
       function showAnnouncementSection() {
         document.getElementById("checkinSection").style.display = "none";
         document.getElementById("announcementSection").style.display = "";
+        document.getElementById("showerSection").style.display = "none";
 
         document.getElementById("showCheckinMenuButton").classList.remove("primary-button");
         document.getElementById("showAnnouncementMenuButton").classList.add("primary-button");
+        document.getElementById("showShowerMenuButton").classList.remove("primary-button");
+      }
+
+      function showShowerSection() {
+        document.getElementById("checkinSection").style.display = "none";
+        document.getElementById("announcementSection").style.display = "none";
+        document.getElementById("showerSection").style.display = "";
+
+        document.getElementById("showCheckinMenuButton").classList.remove("primary-button");
+        document.getElementById("showAnnouncementMenuButton").classList.remove("primary-button");
+        document.getElementById("showShowerMenuButton").classList.add("primary-button");
       }
 
       function escapeHtml(value) {
@@ -531,6 +617,7 @@
         await loadUncheckedList();
         await loadCheckedInList();
         await loadAnnouncementList();
+        await loadShowerRequestList();
       }
 
       async function loadSummary() {
@@ -752,6 +839,8 @@
         document.getElementById("announcementTitle").value = "";
         document.getElementById("announcementBody").value = "";
         document.getElementById("announcementVisible").value = "表示";
+        document.getElementById("showShowerMenuButton").addEventListener("click", showShowerSection);
+        document.getElementById("saveShowerRequestButton").addEventListener("click", saveShowerRequest);
       }
 
       async function editAnnouncement(rowNumber) {
@@ -852,6 +941,136 @@
         }
       }
 
+      async function loadShowerRequestList() {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "showerRequestList",
+            staffKey
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "シャワー申請一覧の取得に失敗しました。", "error");
+            return;
+          }
+
+          renderShowerRequestList(res.items || []);
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+      function renderShowerRequestList(items) {
+        const tbody = document.getElementById("showerRequestListBody");
+
+        if (!items.length) {
+          tbody.innerHTML = `<tr><td colspan="10">シャワー申請はありません。</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = items.map(item => `
+          <tr>
+            <td>${escapeHtml(item.rowNumber || "")}</td>
+            <td>${escapeHtml(item.appliedAt || "")}</td>
+            <td>${escapeHtml(item.name || "")}</td>
+            <td>${escapeHtml(item.group || "")}</td>
+            <td>${escapeHtml(item.room || "")}</td>
+            <td>${escapeHtml(item.requestStatus || "")}</td>
+            <td>${escapeHtml(item.startTime || "")}</td>
+            <td>${escapeHtml(item.endTime || "")}</td>
+            <td>${escapeHtml(item.showerRoom || "")}</td>
+            <td>
+              <button class="small" type="button" onclick="editShowerRequest(${item.rowNumber})">編集</button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      async function editShowerRequest(rowNumber) {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        try {
+          const res = await jsonpRequest({
+            api: "showerRequestList",
+            staffKey
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "読み込みに失敗しました。", "error");
+            return;
+          }
+
+          const item = (res.items || []).find(x => Number(x.rowNumber) === Number(rowNumber));
+          if (!item) {
+            showMessage("該当する申請が見つかりません。", "error");
+            return;
+          }
+
+          currentShowerEditRow = rowNumber;
+          document.getElementById("editingShowerRow").textContent = rowNumber;
+          document.getElementById("showerRequestStatus").value = item.requestStatus || "申請中";
+          document.getElementById("showerStartTime").value = item.startTime || "";
+          document.getElementById("showerEndTime").value = item.endTime || "";
+          document.getElementById("showerRoomInput").value = item.showerRoom || "";
+          document.getElementById("showerStaffMemo").value = item.staffMemo || "";
+
+          showMessage(`行 ${rowNumber} のシャワー申請を編集中です。`, "ok");
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
+      async function saveShowerRequest() {
+        const staffKey = getStaffKey();
+        if (!staffKey) {
+          showMessage("スタッフキーを入力してください。", "error");
+          return;
+        }
+
+        if (!currentShowerEditRow) {
+          showMessage("一覧から編集する申請を選択してください。", "error");
+          return;
+        }
+
+        const requestStatus = document.getElementById("showerRequestStatus").value || "申請中";
+        const startTime = document.getElementById("showerStartTime").value || "";
+        const endTime = document.getElementById("showerEndTime").value || "";
+        const showerRoom = document.getElementById("showerRoomInput").value || "";
+        const staffMemo = document.getElementById("showerStaffMemo").value || "";
+
+        try {
+          const res = await jsonpRequest({
+            api: "updateShowerRequest",
+            staffKey,
+            rowNumber: currentShowerEditRow,
+            requestStatus,
+            startTime,
+            endTime,
+            showerRoom,
+            staffMemo
+          });
+
+          if (res.status !== "ok") {
+            showMessage(res.message || "シャワー申請の保存に失敗しました。", "error");
+            return;
+          }
+
+          await loadShowerRequestList();
+          showMessage(res.message || "シャワー申請を保存しました。", "ok");
+        } catch (error) {
+          showMessage(error.message || "通信エラーが発生しました。", "error");
+        }
+      }
+
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
     document.getElementById("showCheckinMenuButton").addEventListener("click", showCheckinSection);
@@ -863,6 +1082,7 @@
           loadUncheckedList();
           loadCheckedInList();
           loadAnnouncementList();
+          loadShowerRequestList();
         }
     }, 30000);
 
