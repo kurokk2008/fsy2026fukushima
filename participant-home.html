@@ -373,6 +373,12 @@
         border-radius: 10px;
         background: #fff;
       }
+
+      #applyShowerRequestButton:disabled {
+        background: #b7c7e6;
+        cursor: not-allowed;
+        opacity: 0.9;
+      }
       
     </style>
   </head>
@@ -1065,10 +1071,13 @@ async function loadShowerRequestStatus() {
   const timeEl = document.getElementById("showerRequestTimeText");
   const roomEl = document.getElementById("showerRequestRoomText");
   const memoEl = document.getElementById("showerRequestMemoText");
+  const btn = document.getElementById("applyShowerRequestButton");
 
   if (!name || !birth) {
     statusEl.textContent = "未申請";
     detailBox.style.display = "none";
+    btn.disabled = false;
+    btn.textContent = "シャワー利用を申請する";
     return;
   }
 
@@ -1082,44 +1091,46 @@ async function loadShowerRequestStatus() {
     if (res.status !== "ok") {
       statusEl.textContent = "取得失敗";
       detailBox.style.display = "none";
+      btn.disabled = false;
+      btn.textContent = "シャワー利用を申請する";
       return;
     }
 
-    statusEl.textContent = res.requestStatus || "未申請";
+    const requestStatus = res.requestStatus || "未申請";
+    statusEl.textContent = requestStatus;
 
-    if (res.requestStatus === "受理") {
+    if (requestStatus === "受理") {
       detailBox.style.display = "";
-      timeEl.textContent = (res.startTime && res.endTime) ? `${res.startTime}〜${res.endTime}` : "未設定";
+      timeEl.textContent = (res.startTime && res.endTime)
+        ? `${res.startTime}〜${res.endTime}`
+        : "未設定";
       roomEl.textContent = res.showerRoom || "未設定";
       memoEl.textContent = res.staffMemo || "スタッフ案内をご確認ください。";
-      return;
-    }
-
-    if (res.requestStatus === "受付") {
+    } else if (requestStatus === "受付") {
       detailBox.style.display = "";
       timeEl.textContent = "調整中";
       roomEl.textContent = "調整中";
       memoEl.textContent = res.staffMemo || "調整中です。案内をお待ちください。";
-      return;
+    } else {
+      detailBox.style.display = "none";
     }
 
-    detailBox.style.display = "none";
+    if (requestStatus === "申請中" || requestStatus === "受付" || requestStatus === "受理") {
+      btn.disabled = true;
+      btn.textContent = "申請済み";
+    } else {
+      btn.disabled = false;
+      btn.textContent = "シャワー利用を申請する";
+    }
+
   } catch (e) {
     statusEl.textContent = "取得失敗";
     detailBox.style.display = "none";
-  }
-
-  const btn = document.getElementById("applyShowerRequestButton");
-
-  if (res.requestStatus === "申請中" || res.requestStatus === "受付" || res.requestStatus === "受理") {
-    btn.disabled = true;
-    btn.textContent = "申請済み";
-  } else {
     btn.disabled = false;
     btn.textContent = "シャワー利用を申請する";
   }
 }
-
+  
 async function applyShowerRequest() {
   const name = (localStorage.getItem("participant_name") || "").trim();
   const birth = (localStorage.getItem("participant_birth") || "").trim();
