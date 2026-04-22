@@ -494,6 +494,9 @@
     <div class="info-row">
       <strong>現在の申請状況：</strong><span id="showerRequestStatusText">確認中...</span>
     </div>
+    <div class="info-row">
+      <strong>申請日時：</strong><span id="showerRequestDateText">―</span>
+    </div>
 
     <div id="showerRequestDetailBox" class="notice-box" style="display:none;">
       <div class="info-row"><strong>利用時間：</strong><span id="showerRequestTimeText">未設定</span></div>
@@ -573,7 +576,7 @@
      false = テストUIを非表示
      ========================= */
   const ENABLE_PROGRAM_TEST_UI = false;
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbweGCu8kAQujfFRWFoWYgZtyrOfKUy6Hc2izDeWUb8WCCBBIiZjJNG4TnlB41cdF1UKXA/exec";  //fsy2026福島 PWA Ver38
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxwuoAp3aaF-4WiZIzAMbhALbLddk0bu_PZPwz3M4kuB5xvlb3YBQxCjjnc3cEpru9SpQ/exec";  //fsy2026福島 PWA Ver39
   let lastAnnouncementHash = "";
 
   function safeGet(key) {
@@ -1072,9 +1075,11 @@ async function loadShowerRequestStatus() {
   const roomEl = document.getElementById("showerRequestRoomText");
   const memoEl = document.getElementById("showerRequestMemoText");
   const btn = document.getElementById("applyShowerRequestButton");
+  const dateEl = document.getElementById("showerRequestDateText");
 
   if (!name || !birth) {
     statusEl.textContent = "未申請";
+    dateEl.textContent = "―";
     detailBox.style.display = "none";
     btn.disabled = false;
     btn.textContent = "シャワー利用を申請する";
@@ -1090,6 +1095,7 @@ async function loadShowerRequestStatus() {
 
     if (res.status !== "ok") {
       statusEl.textContent = "取得失敗";
+      dateEl.textContent = "―";
       detailBox.style.display = "none";
       btn.disabled = false;
       btn.textContent = "シャワー利用を申請する";
@@ -1098,6 +1104,7 @@ async function loadShowerRequestStatus() {
 
     const requestStatus = res.requestStatus || "未申請";
     statusEl.textContent = requestStatus;
+    dateEl.textContent = res.requestTime || "―";
 
     if (requestStatus === "受理") {
       detailBox.style.display = "";
@@ -1125,6 +1132,7 @@ async function loadShowerRequestStatus() {
 
   } catch (e) {
     statusEl.textContent = "取得失敗";
+    dateEl.textContent = "―";
     detailBox.style.display = "none";
     btn.disabled = false;
     btn.textContent = "シャワー利用を申請する";
