@@ -1014,7 +1014,8 @@
           }
 
           currentShowerEditRow = rowNumber;
-          document.getElementById("editingShowerRow").textContent = rowNumber;
+          document.getElementById("editingShowerRow").textContent =
+            `${item.name || "名前未設定"}（行 ${rowNumber}）`;
           document.getElementById("showerRequestStatus").value = item.requestStatus || "申請中";
           document.getElementById("showerStartTime").value = item.startTime || "";
           document.getElementById("showerEndTime").value = item.endTime || "";
