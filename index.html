@@ -275,7 +275,7 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycby5hBrcvXpJOH45a2VyofYN30hY0gKCCafh9NviTSPLMz-MwYQyoKVCO5hwrgrzrfjz7w/exec";              // fsy2026福島 PWA Ver44
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbxViVmgu0LV1OH8wTxWLEwgLUCwXJwvdo4NlhJZBwOO1prqV2wiGn29l3oi0M4O00s0Qg/exec";              // fsy2026福島 PWA Ver45
       const PARTICIPANT_HOME_URL = "./participant-home.html";                                                                                            // 登録後の参加者メニュー
 
       // 安定運用のため、既存の Service Worker を解除
@@ -481,6 +481,7 @@
           localStorage.setItem("participant_room", res.room || "");
           localStorage.setItem("participant_baggage", res.baggage || "");
           localStorage.setItem("participant_birth", document.getElementById("birth").value || "");
+          localStorage.setItem("participant_companion_set", res.companionSet || "");
 
           result.innerHTML = `
             <div class="panel duplicate-box"><strong>${escapeHtml(res.message || "すでにチェックイン済みです。")}</strong></div>
