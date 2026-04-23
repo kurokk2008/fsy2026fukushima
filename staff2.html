@@ -1060,6 +1060,13 @@
         const showerRoom = document.getElementById("showerRoomInput").value || "";
         const staffMemo = document.getElementById("showerStaffMemo").value || "";
 
+        if ((requestStatus === "受付" || requestStatus === "受理")) {
+          if (!startTime || !endTime || !showerRoom) {
+            showMessage("受付または受理にする場合は、開始時刻・終了時刻・シャワー室を設定してください。", "error");
+            return;
+          }
+        }
+        
         try {
           const res = await jsonpRequest({
             api: "updateShowerRequest",
