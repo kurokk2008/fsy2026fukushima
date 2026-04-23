@@ -486,27 +486,43 @@
         </div>
       </div>
 
-  <div class="card">
-    <h2>シャワー申請一覧</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>行</th>
-          <th>申請日時</th>
-          <th>名前</th>
-          <th>グループ</th>
-          <th>宿泊部屋</th>
-          <th>状態</th>
-          <th>開始</th>
-          <th>終了</th>
-          <th>シャワー室</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="showerRequestListBody"></tbody>
-    </table>
-  </div>
-</div>
+      <div class="card">
+        <h2>シャワー枠状況</h2>
+        <p class="sub">当日の利用状況を確認できます。</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>C棟</th>
+              <th>D棟</th>
+            </tr>
+          </thead>
+          <tbody id="showerSlotTableBody"></tbody>
+        </table>
+      </div>
+ 
+      <div class="card">
+        <h2>シャワー申請一覧</h2>
+        <table>
+           <thead>
+            <tr>
+              <th>行</th>
+              <th>申請日時</th>
+              <th>名前</th>
+              <th>グループ</th>
+              <th>宿泊部屋</th>
+              <th>状態</th>
+              <th>開始</th>
+              <th>終了</th>
+              <th>シャワー室</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="showerRequestListBody"></tbody>
+        </table>
+      </div>
+    </div>
 
       
     </div>   
@@ -632,6 +648,7 @@
         await loadCheckedInList();
         await loadAnnouncementList();
         await loadShowerRequestList();
+        await loadShowerSlots();
       }
 
       async function loadSummary() {
@@ -1105,6 +1122,49 @@
         document.getElementById("showerEndTime").value = add30Minutes(start);
       }
 
+      async function loadShowerSlots() {
+        const staffKey = getStaffKey();
+        if (!staffKey) return;
+
+        try {
+          const res = await jsonpRequest({
+            api: "getShowerSlots",
+            staffKey
+          });
+
+          if (res.status !== "ok") return;
+
+          renderShowerSlots(res);
+        } catch (e) {
+          console.error("シャワー枠取得失敗", e);
+        }
+      }
+
+      function renderShowerSlots(data) {
+        const tbody = document.getElementById("showerSlotTableBody");
+        const { slots, timeSlots, rooms } = data;
+
+        tbody.innerHTML = timeSlots.map(time => {
+          const c = slots[time][rooms[0]];
+          const d = slots[time][rooms[1]];
+
+          const renderCell = (cell) => {
+            if (cell.status === '使用中') {
+              return `<span style="color:red;font-weight:bold;">使用中（${escapeHtml(cell.name)}）</span>`;
+            }
+            return `<span style="color:#4caf50;">空き</span>`;
+          };
+
+          return `
+            <tr>
+              <td>${time}</td>
+              <td>${renderCell(c)}</td>
+              <td>${renderCell(d)}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+      
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
     document.getElementById("showCheckinMenuButton").addEventListener("click", showCheckinSection);
@@ -1120,6 +1180,7 @@
           loadCheckedInList();
           loadAnnouncementList();
           loadShowerRequestList();
+          loadShowerSlots();
         }
     }, 30000);
 
