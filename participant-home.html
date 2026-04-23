@@ -1145,25 +1145,33 @@ async function loadShowerRequestStatus() {
       return;
     }
 
-    const requestStatus = res.requestStatus || "未申請";
+    const rawStatus = (res.requestStatus || "未申請").trim();
     const requestTime = res.requestTime || "";
 
-    if (requestStatus === "未申請") {
+    // 状態のゆれを吸収
+    let normalizedStatus = rawStatus;
+    if (rawStatus === "承認" || rawStatus === "承認済み") {
+      normalizedStatus = "受理";
+    }
+
+    if (normalizedStatus === "未申請") {
       statusEl.textContent = `未申請（${todayLabel}分）`;
+    } else if (normalizedStatus === "受理") {
+      statusEl.textContent = `受理済み（${todayLabel}の申請）`;
     } else {
-      statusEl.textContent = `${requestStatus}（${todayLabel}の申請）`;
+      statusEl.textContent = `${normalizedStatus}（${todayLabel}の申請）`;
     }
 
     dateEl.textContent = requestTime || "―";
 
-    if (requestStatus === "受理") {
+    if (normalizedStatus === "受理") {
       detailBox.style.display = "";
       timeEl.textContent = (res.startTime && res.endTime)
         ? `${res.startTime}〜${res.endTime}`
         : "未設定";
       roomEl.textContent = res.showerRoom || "未設定";
       memoEl.textContent = res.staffMemo || "C宿泊棟の利用時には実務ADの黒木姉妹に一声おかけください。";
-    } else if (requestStatus === "受付") {
+    } else if (normalizedStatus === "受付") {
       detailBox.style.display = "";
       timeEl.textContent = "調整中";
       roomEl.textContent = "調整中";
@@ -1172,7 +1180,7 @@ async function loadShowerRequestStatus() {
       detailBox.style.display = "none";
     }
 
-    if (requestStatus === "申請中" || requestStatus === "受付" || requestStatus === "受理") {
+    if (normalizedStatus === "申請中" || normalizedStatus === "受付" || normalizedStatus === "受理") {
       btn.disabled = true;
       btn.textContent = "申請済み";
     } else {
