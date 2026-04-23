@@ -1077,8 +1077,11 @@ async function loadShowerRequestStatus() {
   const btn = document.getElementById("applyShowerRequestButton");
   const dateEl = document.getElementById("showerRequestDateText");
 
+  const now = new Date();
+  const todayLabel = `${now.getMonth() + 1}/${now.getDate()}`;
+
   if (!name || !birth) {
-    statusEl.textContent = "未申請";
+    statusEl.textContent = `未申請（${todayLabel}分）`;
     dateEl.textContent = "―";
     detailBox.style.display = "none";
     btn.disabled = false;
@@ -1103,8 +1106,15 @@ async function loadShowerRequestStatus() {
     }
 
     const requestStatus = res.requestStatus || "未申請";
-    statusEl.textContent = requestStatus;
-    dateEl.textContent = res.requestTime || "―";
+    const requestTime = res.requestTime || "";
+
+    if (requestStatus === "未申請") {
+      statusEl.textContent = `未申請（${todayLabel}分）`;
+    } else {
+      statusEl.textContent = `${requestStatus}（${todayLabel}の申請）`;
+    }
+
+    dateEl.textContent = requestTime || "―";
 
     if (requestStatus === "受理") {
       detailBox.style.display = "";
@@ -1138,7 +1148,6 @@ async function loadShowerRequestStatus() {
     btn.textContent = "シャワー利用を申請する";
   }
 }
-  
 async function applyShowerRequest() {
   const name = (localStorage.getItem("participant_name") || "").trim();
   const birth = (localStorage.getItem("participant_birth") || "").trim();
