@@ -1122,7 +1122,7 @@ async function loadShowerRequestStatus() {
         ? `${res.startTime}〜${res.endTime}`
         : "未設定";
       roomEl.textContent = res.showerRoom || "未設定";
-      memoEl.textContent = res.staffMemo || "スタッフ案内をご確認ください。";
+      memoEl.textContent = res.staffMemo || "C宿泊棟の利用時には実務ADの黒木姉妹に一声おかけください。";
     } else if (requestStatus === "受付") {
       detailBox.style.display = "";
       timeEl.textContent = "調整中";
