@@ -449,17 +449,31 @@
 
         <div class="form-row">
           <label for="showerStartTime"><strong>利用開始時刻</strong></label>
-          <input id="showerStartTime" type="time" class="text-input">
+          <select id="showerStartTime" class="text-input">
+            <option value="">選択してください</option>
+            <option value="18:00">18:00</option>
+            <option value="18:30">18:30</option>
+            <option value="19:00">19:00</option>
+            <option value="19:30">19:30</option>
+            <option value="20:00">20:00</option>
+            <option value="20:30">20:30</option>
+            <option value="21:00">21:00</option>
+            <option value="21:30">21:30</option>
+          </select>
         </div>
 
         <div class="form-row">
           <label for="showerEndTime"><strong>利用終了時刻</strong></label>
-          <input id="showerEndTime" type="time" class="text-input">
+          <input id="showerEndTime" type="text" class="text-input" readonly>
         </div>
 
         <div class="form-row">
           <label for="showerRoomInput"><strong>シャワー室</strong></label>
-          <input id="showerRoomInput" type="text" class="text-input" placeholder="例：シャワー室A">
+          <select id="showerRoomInput" class="text-input">
+            <option value="">選択してください</option>
+            <option value="C棟宿泊室 シャワー室">C棟宿泊室 シャワー室</option>
+            <option value="D棟 シャワー室①">D棟 シャワー室①</option>
+<         </select>
         </div>
 
         <div class="form-row">
@@ -1070,12 +1084,27 @@
         }
       }
 
+      function add30Minutes(hm) {
+        if (!hm) return "";
+        const [h, m] = hm.split(":").map(Number);
+        const total = h * 60 + m + 30;
+        const hh = String(Math.floor(total / 60)).padStart(2, "0");
+        const mm = String(total % 60).padStart(2, "0");
+        return `${hh}:${mm}`;
+      }
+
+      function updateShowerEndTime() {
+        const start = document.getElementById("showerStartTime").value || "";
+        document.getElementById("showerEndTime").value = add30Minutes(start);
+      }
+
     document.getElementById("saveAnnouncementButton").addEventListener("click", saveAnnouncement);
     document.getElementById("newAnnouncementButton").addEventListener("click", resetAnnouncementForm);
     document.getElementById("showCheckinMenuButton").addEventListener("click", showCheckinSection);
     document.getElementById("showAnnouncementMenuButton").addEventListener("click", showAnnouncementSection);
     document.getElementById("showShowerMenuButton").addEventListener("click", showShowerSection);
     document.getElementById("saveShowerRequestButton").addEventListener("click", saveShowerRequest);
+    document.getElementById("showerStartTime").addEventListener("change", updateShowerEndTime);
       
     setInterval(() => {
         if (getStaffKey()) {
