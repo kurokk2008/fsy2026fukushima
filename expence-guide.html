@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>経費精算の案内</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --sub: #6b7280;
+        --primary: #2f80ed;
+        --primary-hover: #1c6fe0;
+        --border: #d7dee8;
+        --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 16px;
+      }
+
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+
+      h1, h2 {
+        margin-top: 0;
+      }
+
+      p, li {
+        line-height: 1.8;
+      }
+
+      .sub {
+        color: var(--sub);
+        font-size: 14px;
+      }
+
+      .info-box {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .menu-link {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .menu-link:hover {
+        background: var(--primary-hover);
+      }
+
+      .menu-link.back {
+        background: #6b7280;
+      }
+
+      .menu-link.back:hover {
+        background: #4b5563;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .section {
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>経費精算の案内</h1>
+        <p class="sub">必要事項を確認してから、精算申請フォームへ進んでください。</p>
+      </div>
+
+      <div class="card">
+        <h2>1. 精算申請フォーム</h2>
+        <div class="info-box">
+          <p>精算申請は以下のURLから実施してください。</p>
+          <div style="margin-top: 12px;">
+            <a
+              class="menu-link"
+              href="https://forms.office.com/r/WKUHhfhUSn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              経費精算フォームを開く
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. 事前に準備する情報</h2>
+        <div class="info-box">
+          <p>以下はあらかじめ確認しておいてください。</p>
+          <ul>
+            <li>申請者の会員記録番号（例: 024-1234-5678）</li>
+            <li>支払先の金融機関情報
+              <ul>
+                <li>金融機関名・銀行コード</li>
+                <li>支店名・支店コード</li>
+                <li>口座種類（例: 普通）</li>
+                <li>口座番号</li>
+                <li>口座名義（カナ）</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>3. 領収書について</h2>
+        <div class="info-box">
+          <p>
+            新幹線など大きな金額の場合は、領収書が必要です。
+            ただし、今回からは画像のみで対応可能で、領収書の郵送提出は不要です。
+          </p>
+
+          <p class="section">
+            解像度が低いと領収書として成立しなくなることがあります。
+            最近のスマホなどで、ぶれずに必要な情報が読み取れるよう、
+            白いA4用紙などの上に収まるように置いて撮影してください。
+          </p>
+
+          <p class="section">
+            近隣の電車、路線バスなどの代金は領収書は不要です。
+            ご利用情報（利用日、利用区間、切符 / IC 利用）を補足説明欄に記入してください。
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <a class="menu-link back" href="./participant-home.html">← 参加者ホームへ戻る</a>
+      </div>
+    </div>
+  </body>
+</html>
