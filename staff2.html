@@ -264,6 +264,15 @@
       .menu-three {
         grid-template-columns: 1fr 1fr 1fr;
       }
+
+      tr.past-row {
+        background: #f1f3f5;
+        color: #9aa0a6;
+      }
+
+      tr.past-row td {
+        opacity: 0.7;
+      }
       
     </style>
   </head>
@@ -994,31 +1003,70 @@
         }
       }
 
-      function renderShowerRequestList(items) {
-        const tbody = document.getElementById("showerRequestListBody");
+function renderShowerRequestList(items) {
+  const tbody = document.getElementById("showerRequestListBody");
 
-        if (!items.length) {
-          tbody.innerHTML = `<tr><td colspan="10">シャワー申請はありません。</td></tr>`;
-          return;
-        }
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="10">シャワー申請はありません。</td></tr>`;
+    return;
+  }
 
-        tbody.innerHTML = items.map(item => `
-          <tr>
-            <td>${escapeHtml(item.rowNumber || "")}</td>
-            <td>${escapeHtml(item.appliedAt || "")}</td>
-            <td>${escapeHtml(item.name || "")}</td>
-            <td>${escapeHtml(item.group || "")}</td>
-            <td>${escapeHtml(item.room || "")}</td>
-            <td>${escapeHtml(item.requestStatus || "")}</td>
-            <td>${escapeHtml(item.startTime || "")}</td>
-            <td>${escapeHtml(item.endTime || "")}</td>
-            <td>${escapeHtml(item.showerRoom || "")}</td>
-            <td>
-              <button class="small" type="button" onclick="editShowerRequest(${item.rowNumber})">編集</button>
-            </td>
-          </tr>
-        `).join("");
-      }
+  // 日付キー生成（yyyyMMdd）
+  function getDateKey(value) {
+    if (!value) return "";
+
+    // Date型の場合
+    if (value instanceof Date) {
+      const y = value.getFullYear();
+      const m = String(value.getMonth() + 1).padStart(2, "0");
+      const d = String(value.getDate()).padStart(2, "0");
+      return `${y}${m}${d}`;
+    }
+
+    // 文字列の場合（表示値対応）
+    return String(value).replace(/\D/g, "").slice(0, 8);
+  }
+
+  const todayKey = getDateKey(new Date());
+
+  // 並び替え（今日 → 過去）
+  items.sort((a, b) => {
+    const aKey = getDateKey(a.appliedAt);
+    const bKey = getDateKey(b.appliedAt);
+
+    if (aKey === todayKey && bKey !== todayKey) return -1;
+    if (aKey !== todayKey && bKey === todayKey) return 1;
+
+    return String(b.appliedAt || "").localeCompare(String(a.appliedAt || ""));
+  });
+
+  tbody.innerHTML = items.map(item => {
+    const appliedDateKey = getDateKey(item.appliedAt);
+    const isPast = appliedDateKey !== todayKey;
+
+    const rowClass = isPast ? "past-row" : "";
+
+    // 今日以外は編集不可
+    const actionHtml = isPast
+      ? `<span style="color:#9aa0a6;">対象外</span>`
+      : `<button class="small" type="button" onclick="editShowerRequest(${item.rowNumber})">編集</button>`;
+
+    return `
+      <tr class="${rowClass}">
+        <td>${escapeHtml(item.rowNumber || "")}</td>
+        <td>${escapeHtml(item.appliedAt || "")}</td>
+        <td>${escapeHtml(item.name || "")}</td>
+        <td>${escapeHtml(item.group || "")}</td>
+        <td>${escapeHtml(item.room || "")}</td>
+        <td>${escapeHtml(item.requestStatus || "")}</td>
+        <td>${escapeHtml(item.startTime || "")}</td>
+        <td>${escapeHtml(item.endTime || "")}</td>
+        <td>${escapeHtml(item.showerRoom || "")}</td>
+        <td>${actionHtml}</td>
+      </tr>
+    `;
+  }).join("");
+}
 
       async function editShowerRequest(rowNumber) {
         const staffKey = getStaffKey();
