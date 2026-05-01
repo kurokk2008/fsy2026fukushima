@@ -7,7 +7,7 @@ window.PROGRAM_DATA = {
       title: "事前合宿1日目プログラム",
       items: [
         { time: "10:30-11:00", title: "集合", place: "新白河駅" },
-        { time: "11:00", title: "バス出発時間", place: "新白河駅" },
+        { time: "11:00", title: "バス出発時間", place: "新白河駅　東口" },
         { time: "11:50-12:30", title: "昼食", place: "レストラン" },
         { time: "12:30-13:00", title: "入所オリエンテーション", place: "エコルーム２" },
         { time: "13:00", title: "開会", place: "エコルーム２" },
@@ -34,12 +34,13 @@ window.PROGRAM_DATA = {
         { time: "8:45-10:00", title: "モーニングディボーショナル", place: "エコルーム２" },
         { time: "10:00-11:45", title: "全体の流れ確認", place: "エコルーム２" },
         { time: "11:50-12:30", title: "昼食", place: "レストラン" },
-        { time: "12:45-13:30", title: "YMYWの活動", place: "プレイホール" },
-        { time: "13:45-14:45", title: "ゲームナイト", place: "プレイホール" },
+        { time: "12:45-13:00", title: "写真撮影", place: "プレイホール" },
+        { time: "13:00-13:30", title: "YM・YW活動", place: "プレイホール" },
+        { time: "13:45-14:45", title: "バラエティショー", place: "プレイホール" },
         { time: "15:00-16:30", title: "ダンス", place: "プレイホール" },
         { time: "16:45-17:00", title: "夕べの集い", place: "ラジオ体操広場" },
         { time: "17:10-17:50", title: "夕食", place: "レストラン" },
-        { time: "18:00-19:00", title: "バラエティショー", place: "プレイホール" },
+        { time: "18:00-19:00", title: "ゲームナイト", place: "プレイホール" },
         { time: "19:15-19:55", title: "お風呂", place: "大浴場、または中浴場" }
       ]
     },
